@@ -5,7 +5,7 @@
 **EVCC Scheduler** ist eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepläne über die EVCC API. Die Integration synchronisiert die Fahrzeugauswahl mit EVCC und bietet eine zentrale Verwaltung von Ladeplänen mit automatischer Entfernung verwaister Entities.
 
 **Lizenz:** MIT  
-**Repository:** [GitHub](https://github.com/yourusername/evcc_scheduler)  
+**Repository:** [GitHub](https://github.com/diestrohs/ha-evcc-scheduler)  
 **HACS:** ✅ Kompatibel & verfügbar  
 **Home Assistant:** 2025.12.0+  
 **EVCC:** 0.210.2+
@@ -18,7 +18,7 @@
 
 ```
 HACS → Integrationen → ⋮ → Custom Repositories
-→ https://github.com/yourusername/evcc_scheduler
+→ https://github.com/diestrohs/ha-evcc-scheduler
 → Kategorie: Integration
 → Suche: EVCC Scheduler → Installieren
 → Home Assistant neu starten ⭐ WICHTIG
@@ -81,7 +81,7 @@ Alle Fahrzeuge, die in EVCC konfiguriert sind:
 1. Öffne HACS in Home Assistant
 2. Gehe zu "Integrationen"
 3. Klicke auf das Menü (oben rechts) → "Custom Repositories"
-4. Füge folgende URL ein: `https://github.com/yourusername/evcc_scheduler`
+4. Füge folgende URL ein: `https://github.com/diestrohs/ha-evcc-scheduler`
 5. Wähle **"Integration"** als Kategorie
 6. Klicke "Erstellen"
 7. Suche nach "EVCC Scheduler" und klicke "Installieren"
@@ -91,7 +91,7 @@ Alle Fahrzeuge, die in EVCC konfiguriert sind:
 
 ```bash
 cd /config/custom_components
-git clone https://github.com/yourusername/evcc_scheduler.git
+git clone https://github.com/diestrohs/ha-evcc-scheduler.git
 # Home Assistant neu starten
 ```
 

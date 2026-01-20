@@ -25,7 +25,7 @@ Diese Dokumentation erklärt, wie man EVCC Scheduler über HACS installiert.
 
 1. Gib folgende URL ein:
    ```
-   https://github.com/yourusername/evcc_scheduler
+   https://github.com/diestrohs/ha-evcc-scheduler
    ```
 2. Wähle als **Kategorie**: `Integration`
 3. Klicke **"Erstellen"**
@@ -124,8 +124,8 @@ Mit HACS:
 ## Support
 
 - 📚 [Vollständige Dokumentation](DOCUMENTATION.md)
-- 🐛 [Bug Reports](https://github.com/yourusername/evcc_scheduler/issues)
-- 💬 [Diskussionen](https://github.com/yourusername/evcc_scheduler/discussions)
+- 🐛 [Bug Reports](https://github.com/diestrohs/ha-evcc-scheduler/issues)
+- 💬 [Diskussionen](https://github.com/diestrohs/ha-evcc-scheduler/discussions)
 
 ---
 

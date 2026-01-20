@@ -78,7 +78,7 @@ Gibt es andere Lösungen?
 **Entwicklungs-Setup:**
 
 ```bash
-git clone https://github.com/yourusername/evcc_scheduler.git
+git clone https://github.com/diestrohs/ha-evcc-scheduler.git
 cd evcc_scheduler
 pip install -e .
 ```
@@ -117,7 +117,7 @@ Update `manifest.json` `version` Feld bei Releases.
 ## Fragen?
 
 - 📚 Lese die [DOCUMENTATION.md](DOCUMENTATION.md)
-- 💬 Öffne eine [Discussion](https://github.com/yourusername/evcc_scheduler/discussions)
+- 💬 Öffne eine [Discussion](https://github.com/diestrohs/ha-evcc-scheduler/discussions)
 - 📧 Kontaktiere die Maintainer
 
 ## Lizenz

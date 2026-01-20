@@ -23,7 +23,7 @@
 - [x] `documentation`: URL zu GitHub
 - [x] `issuetracker`: URL zu GitHub Issues
 - [x] `requirements`: aiohttp>=3.8.0
-- [x] `codeowners`: ["@yourusername"]
+- [x] `codeowners`: ["@diestrohs"]
 - [x] `iot_class`: "local_polling"
 - [x] `integration_type`: "service"
 - [x] `platforms`: ["switch"]
@@ -188,7 +188,7 @@ evcc_scheduler/
 ### Schritt 1: Repository zu HACS hinzufügen
 ```
 HACS → Integrationen → ⋮ → Custom Repositories
-→ https://github.com/yourusername/evcc_scheduler
+→ https://github.com/diestrohs/ha-evcc-scheduler
 → Kategorie: Integration
 → Erstellen
 ```
@@ -263,7 +263,7 @@ git push origin main --tags
 
 **Dann in HACS**:
 1. HACS → Integrationen → ⋮ → Custom Repositories
-2. URL eingeben: `https://github.com/yourusername/evcc_scheduler`
+2. URL eingeben: `https://github.com/diestrohs/ha-evcc-scheduler`
 3. Fertig! HACS validiert automatisch.
 
 ---

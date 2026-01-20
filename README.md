@@ -19,7 +19,7 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
 1. Öffne HACS in Home Assistant
 2. Gehe zu "Integrationen"
 3. Klicke auf das Menü (oben rechts) → "Custom Repositories"
-4. Füge folgende URL ein: `https://github.com/yourusername/evcc_scheduler`
+4. Füge folgende URL ein: `https://github.com/diestrohs/ha-evcc-scheduler`
 5. Wähle "Integration" als Kategorie
 6. Klicke "Erstellen"
 7. Suche nach "EVCC Scheduler" und klicke "Installieren"
@@ -29,7 +29,7 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
 
 ```bash
 cd /config/custom_components
-git clone https://github.com/yourusername/evcc_scheduler.git
+git clone https://github.com/diestrohs/ha-evcc-scheduler.git
 # Home Assistant neu starten
 ```
 
@@ -152,9 +152,9 @@ Wenn die Integration nicht funktioniert:
 
 ## Support
 
-- 🐛 [Bug Reports](https://github.com/yourusername/evcc_scheduler/issues)
-- 💬 [Diskussionen](https://github.com/yourusername/evcc_scheduler/discussions)
-- 📚 [Dokumentation](https://github.com/yourusername/evcc_scheduler/wiki)
+- 🐛 [Bug Reports](https://github.com/diestrohs/ha-evcc-scheduler/issues)
+- 💬 [Diskussionen](https://github.com/diestrohs/ha-evcc-scheduler/discussions)
+- 📚 [Dokumentation](https://github.com/diestrohs/ha-evcc-scheduler/wiki)
 
 ## Lizenz
 
