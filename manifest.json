@@ -1,0 +1,15 @@
+{
+  "domain": "evcc_scheduler",
+  "name": "EVCC Scheduler",
+  "codeowners": ["@yourusername"],
+  "config_flow": true,
+  "documentation": "https://github.com/yourusername/evcc_scheduler",
+  "issuetracker": "https://github.com/yourusername/evcc_scheduler/issues",
+  "requirements": ["aiohttp>=3.8.0"],
+  "version": "0.0.4",
+  "homeassistant": "2025.12.0",
+  "iot_class": "local_polling",
+  "integration_type": "service",
+  "platforms": ["switch"],
+  "manifest_version": 1
+}

@@ -1,0 +1,109 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "EVCC Scheduler",
+        "description": "Configure your EVCC Scheduler integration",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "token": "Authentication Token (optional)",
+          "ssl": "Use SSL",
+          "timeout": "Timeout (seconds)",
+          "mode": "Communication Mode"
+        }
+      }
+    },
+    "error": {
+      "invalid_host": "Invalid host address",
+      "connection_failed": "Failed to connect to EVCC"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "EVCC Scheduler Options",
+        "description": "Update EVCC Scheduler settings",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "token": "Authentication Token (optional)",
+          "ssl": "Use SSL",
+          "timeout": "Timeout (seconds)",
+          "mode": "Communication Mode"
+        }
+      }
+    }
+  },
+  "services": {
+    "set_repeating_plan": {
+      "name": "Set Repeating Plan",
+      "description": "Set or modify a repeating charging plan for a vehicle.",
+      "fields": {
+        "vehicle_id": {
+          "name": "Vehicle ID",
+          "description": "The ID of the vehicle (e.g., 'db:1')"
+        },
+        "plan_index": {
+          "name": "Plan Index",
+          "description": "The index of the plan to modify (0-based). Omit to create a new plan."
+        },
+        "time": {
+          "name": "Time",
+          "description": "The time to start charging (HH:MM format)"
+        },
+        "weekdays": {
+          "name": "Weekdays",
+          "description": "List of weekdays (0=Monday, 6=Sunday)"
+        },
+        "soc": {
+          "name": "State of Charge",
+          "description": "State of charge target percentage (0-100)"
+        },
+        "active": {
+          "name": "Active",
+          "description": "Whether the plan is active"
+        }
+      }
+    },
+    "del_repeating_plan": {
+      "name": "Delete Repeating Plan",
+      "description": "Delete a repeating charging plan for a vehicle.",
+      "fields": {
+        "vehicle_id": {
+          "name": "Vehicle ID",
+          "description": "The ID of the vehicle (e.g., 'db:1')"
+        },
+        "plan_index": {
+          "name": "Plan Index",
+          "description": "The index of the plan to delete (0-based)"
+        }
+      }
+    },
+    "toggle_plan_active": {
+      "name": "Toggle Plan Active",
+      "description": "Toggle the active status of a repeating plan.",
+      "fields": {
+        "vehicle_id": {
+          "name": "Vehicle ID",
+          "description": "The ID of the vehicle (e.g., 'db:1')"
+        },
+        "plan_index": {
+          "name": "Plan Index",
+          "description": "The index of the plan to toggle (0-based)"
+        },
+        "active": {
+          "name": "Active",
+          "description": "Set to true/false to turn on/off, omit to toggle"
+        }
+      }
+    }
+  },
+  "entity": {
+    "switch": {
+      "weekly_plan": {
+        "name": "Plan {index}"
+      }
+    }
+  }
+}

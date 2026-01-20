@@ -1,0 +1,59 @@
+set_repeating_plan:
+  description: Set or modify a repeating charging plan for a vehicle.
+  fields:
+    vehicle_id:
+      description: The ID of the vehicle (e.g., "db:1").
+      example: "db:1"
+      required: true
+      selector:
+        text:
+    plan_index:
+      description: The index of the plan to modify (0-based). Omit to create a new plan.
+      example: 0
+      required: false
+      selector:
+        number:
+          min: 0
+    time:
+      description: The time to start charging (HH:MM format).
+      example: "07:00"
+      required: false
+      selector:
+        text:
+    weekdays:
+      description: List of weekdays (0=Monday, 6=Sunday).
+      example: [0, 1, 2, 3, 4]
+      required: false
+      selector:
+        object:
+    soc:
+      description: State of charge target percentage (0-100).
+      example: 80
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 100
+    active:
+      description: Whether the plan is active.
+      example: true
+      required: false
+      selector:
+        boolean:
+
+del_repeating_plan:
+  description: Delete a repeating charging plan for a vehicle.
+  fields:
+    vehicle_id:
+      description: The ID of the vehicle (e.g., "db:1").
+      example: "db:1"
+      required: true
+      selector:
+        text:
+    plan_index:
+      description: The index of the plan to delete (0-based).
+      example: 0
+      required: true
+      selector:
+        number:
+          min: 0

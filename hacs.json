@@ -1,0 +1,7 @@
+{
+  "name": "EVCC Scheduler",
+  "homeassistant": "2025.12.0",
+  "documentation": "https://github.com/yourusername/evcc_scheduler",
+  "issuetracker": "https://github.com/yourusername/evcc_scheduler/issues",
+  "requirements": ["aiohttp>=3.8.0"]
+}

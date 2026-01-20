@@ -1,0 +1,109 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "EVCC Scheduler",
+        "description": "Konfiguriere deine EVCC Scheduler Integration",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "token": "Authentifizierungstoken (optional)",
+          "ssl": "SSL verwenden",
+          "timeout": "Timeout (Sekunden)",
+          "mode": "Kommunikationsmodus"
+        }
+      }
+    },
+    "error": {
+      "invalid_host": "Ungültige Hostadresse",
+      "connection_failed": "Verbindung zu EVCC fehlgeschlagen"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "EVCC Scheduler Optionen",
+        "description": "Aktualisiere die EVCC Scheduler Einstellungen",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "token": "Authentifizierungstoken (optional)",
+          "ssl": "SSL verwenden",
+          "timeout": "Timeout (Sekunden)",
+          "mode": "Kommunikationsmodus"
+        }
+      }
+    }
+  },
+  "services": {
+    "set_repeating_plan": {
+      "name": "Wiederholten Plan festlegen",
+      "description": "Lege einen wiederholten Ladeplan für ein Fahrzeug fest oder ändern ihn.",
+      "fields": {
+        "vehicle_id": {
+          "name": "Fahrzeug-ID",
+          "description": "Die ID des Fahrzeugs (z.B. 'db:1')"
+        },
+        "plan_index": {
+          "name": "Plan-Index",
+          "description": "Der Index des zu ändernden Plans (0-basiert). Weglassen zum Erstellen eines neuen Plans."
+        },
+        "time": {
+          "name": "Uhrzeit",
+          "description": "Die Startzeit des Ladens (HH:MM Format)"
+        },
+        "weekdays": {
+          "name": "Wochentage",
+          "description": "Liste der Wochentage (0=Montag, 6=Sonntag)"
+        },
+        "soc": {
+          "name": "Ladezustand",
+          "description": "Ziel-Ladezustand in Prozent (0-100)"
+        },
+        "active": {
+          "name": "Aktiv",
+          "description": "Ob der Plan aktiv ist"
+        }
+      }
+    },
+    "del_repeating_plan": {
+      "name": "Wiederholten Plan löschen",
+      "description": "Lösche einen wiederholten Ladeplan für ein Fahrzeug.",
+      "fields": {
+        "vehicle_id": {
+          "name": "Fahrzeug-ID",
+          "description": "Die ID des Fahrzeugs (z.B. 'db:1')"
+        },
+        "plan_index": {
+          "name": "Plan-Index",
+          "description": "Der Index des zu löschenden Plans (0-basiert)"
+        }
+      }
+    },
+    "toggle_plan_active": {
+      "name": "Plan-Status umschalten",
+      "description": "Schalte den aktiven Status eines wiederholten Plans um.",
+      "fields": {
+        "vehicle_id": {
+          "name": "Fahrzeug-ID",
+          "description": "Die ID des Fahrzeugs (z.B. 'db:1')"
+        },
+        "plan_index": {
+          "name": "Plan-Index",
+          "description": "Der Index des umzuschaltenden Plans (0-basiert)"
+        },
+        "active": {
+          "name": "Aktiv",
+          "description": "Auf true/false setzen zum Ein-/Ausschalten, weglassen zum Umschalten"
+        }
+      }
+    }
+  },
+  "entity": {
+    "switch": {
+      "weekly_plan": {
+        "name": "Plan {index}"
+      }
+    }
+  }
+}
