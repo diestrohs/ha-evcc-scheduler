@@ -38,7 +38,8 @@
 ### Dokumentation aktualisiert (1 Datei)
 | Datei | Änderung | Status |
 |-------|----------|--------|
-| **DOCUMENTATION.md** | Quick Start & HACS-Anleitung | ✅ Aktualisiert |
+| **DOCUMENTATION.md** | Technical docs (English) | ✅ Created |
+| **DOCUMENTATION_DE.md** | German docs | ✅ Created |
 
 ---
 
@@ -88,7 +89,8 @@ evcc_scheduler/
 │       └── validate.yml              ← CI/CD Pipeline (neu)
 ├── .gitignore                        ← Git-Ignorierungen (neu)
 ├── README.md                         ← Hauptdokumentation (neu)
-├── DOCUMENTATION.md                  ← Technische Docs (aktualisiert)
+├── DOCUMENTATION.md                  ← Technical Docs (English)
+├── DOCUMENTATION_DE.md               ← German Docs
 ├── HACS_INSTALL.md                   ← HACS Installation Guide (neu)
 ├── HACS_READY.md                     ← HACS Checkliste (neu)
 ├── CONTRIBUTING.md                   ← Beitragsrichtlinien (neu)

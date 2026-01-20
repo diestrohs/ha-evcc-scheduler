@@ -99,7 +99,7 @@ flake8 . --max-line-length=120
 
 ### Dokumentation
 
-- Aktualisiere `DOCUMENTATION.md` für technische Änderungen
+- Aktualisiere `DOCUMENTATION.md` für technische Änderungen (oder `DOCUMENTATION_DE.md` für Deutsch)
 - Aktualisiere `README.md` für Nutzer-sichtbare Änderungen
 - Verwende Markdown mit korrektem Formatting
 - Füge Beispiele hinzu wo relevant

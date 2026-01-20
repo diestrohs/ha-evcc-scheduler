@@ -1,12 +1,12 @@
-# EVCC Scheduler - Dokumentation
+# EVCC Scheduler - Documentation
 
-## Übersicht
+## Overview
 
-**EVCC Scheduler** ist eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepläne über die EVCC API. Die Integration synchronisiert die Fahrzeugauswahl mit EVCC und bietet eine zentrale Verwaltung von Ladeplänen mit automatischer Entfernung verwaister Entities.
+**EVCC Scheduler** is a Home Assistant custom integration for managing recurring EV charging schedules via the EVCC API. The integration synchronizes vehicle selection with EVCC and provides centralized management of charging schedules with automatic cleanup of orphaned entities.
 
-**Lizenz:** MIT  
+**License:** MIT  
 **Repository:** [GitHub](https://github.com/diestrohs/ha-evcc-scheduler)  
-**HACS:** ✅ Kompatibel & verfügbar  
+**HACS:** ✅ Compatible & Available  
 **Home Assistant:** 2025.12.0+  
 **EVCC:** 0.210.2+
 
@@ -14,688 +14,392 @@
 
 ## Quick Start 🚀
 
-### 1. Installation mit HACS (1 Minute)
+### 1. Installation with HACS (1 Minute)
 
 ```
-HACS → Integrationen → ⋮ → Custom Repositories
+HACS → Integrations → ⋮ → Custom Repositories
 → https://github.com/diestrohs/ha-evcc-scheduler
-→ Kategorie: Integration
-→ Suche: EVCC Scheduler → Installieren
-→ Home Assistant neu starten ⭐ WICHTIG
+→ Category: Integration
+→ Search: EVCC Scheduler → Install
+→ Restart Home Assistant ⭐ IMPORTANT
 ```
 
-### 2. Konfiguration (2 Minuten)
+### 2. Configuration (2 Minutes)
 
 ```
-Einstellungen → Geräte und Services → + Integration erstellen
-→ Suche: EVCC Scheduler
-→ Host: 192.168.1.100 (EVCC-IP)
-→ Port: 7070 (Standard)
-→ Bestätigen ✅
+Settings → Devices and Services → + Create Integration
+→ Search: EVCC Scheduler
+→ Host: 192.168.1.100 (EVCC IP)
+→ Port: 7070 (Default)
+→ Confirm ✅
 ```
 
-### 3. Fertig! 🎉
+### 3. Done! 🎉
 
-- Entities werden automatisch erstellt
-- Services stehen zur Verfügung
-- WebSocket läuft für Echtzeit-Updates
+- Entities are created automatically
+- Services are available immediately
+- WebSocket runs for real-time updates
 
 ---
 
-## Funktionalität
+## Features
 
-### Kerenfunktionen
+### Core Features
 
-- ✅ **Automatische Fahrzeugauswahl**: Erkennt das in EVCC gewählte Fahrzeug automatisch
-- ✅ **Dynamische Entity-Verwaltung**: Erstellt/löscht Entities basierend auf aktuellem Fahrzeug
-- ✅ **WebSocket-Integration**: Echtzeit-Updates bei Änderungen in EVCC
-- ✅ **Service-Registrierung**: CRUD-Operationen für Ladepläne
-- ✅ **Entity Registry Cleanup**: Automatisches Löschen verwaister Entities
-- ✅ **Multi-Fahrzeug-Support**: Wechsel zwischen mehreren Fahrzeugen mit automatischer Entity-Migration
-- ✅ **Fehlervalidation**: Aussagekräftige Fehlermeldungen bei Service-Aufrufen
+- ✅ **Automatic Vehicle Selection**: Detects the selected vehicle in EVCC automatically
+- ✅ **Dynamic Entity Management**: Creates/deletes entities based on current vehicle
+- ✅ **Real-time Synchronization**: WebSocket updates with fallback to polling (30s)
+- ✅ **Plan Management**: 3 services for creating, updating, deleting plans
+- ✅ **Entity Registry Cleanup**: Removes orphaned entities on restart
+- ✅ **Multi-Vehicle Support**: Handles multiple vehicles with automatic entity migration
+- ✅ **Localized Messages**: German error messages with fallback to English
+- ✅ **Type Hints**: Ready for future mypy integration
+- ✅ **Home Assistant Standards**: Follows HA integration best practices
 
-### Unterstützte Fahrzeuge
+### Architecture
 
-Alle Fahrzeuge, die in EVCC konfiguriert sind:
-- Tesla (Model S, 3, X, Y)
-- Volkswagen (ID.4, ID.5, ID. Buzz, etc.)
-- Škoda (Enyaq, Superb iV, etc.)
-- Audi (e-tron, Q4 e-tron, etc.)
-- Cupra
-- und weitere...
+```
+config_flow.py ──→ __init__.py ──→ coordinator.py ──→ api.py
+    ↓                  ↓
+websocket_client.py    entity_manager.py ←→ switch.py
+    ↓
+websocket_api.py (Custom Card API)
+```
 
 ---
 
 ## Installation
 
-### Voraussetzungen
+### Requirements
 
-- Home Assistant 2025.12 oder neuer (getestet mit 2025.12)
-- EVCC v0.210.2 oder neuer mit aktivierter REST API (getestet mit 0.210.2)
-- EVCC und Home Assistant im gleichen Netzwerk (oder erreichbar)
+- Home Assistant 2025.12.0 or later
+- EVCC 0.210.2 or later (WebSocket mode)
+- Python 3.11 or later
+- Network access to EVCC instance (local network recommended)
 
-### Installationsschritte
+### Installation Steps
 
-#### 1. Mit HACS (empfohlen) 🎉
+#### 1. With HACS (Recommended) 🎉
 
-1. Öffne HACS in Home Assistant
-2. Gehe zu "Integrationen"
-3. Klicke auf das Menü (oben rechts) → "Custom Repositories"
-4. Füge folgende URL ein: `https://github.com/diestrohs/ha-evcc-scheduler`
-5. Wähle **"Integration"** als Kategorie
-6. Klicke "Erstellen"
-7. Suche nach "EVCC Scheduler" und klicke "Installieren"
-8. **⚠️ Wichtig**: Home Assistant neu starten erforderlich!
+1. Open HACS in Home Assistant
+2. Go to "Integrations"
+3. Click the menu (top right) → "Custom Repositories"
+4. Enter URL: `https://github.com/diestrohs/ha-evcc-scheduler`
+5. Select **"Integration"** as category
+6. Click "Create"
+7. Search for "EVCC Scheduler" and click "Install"
+8. **⚠️ Important**: Home Assistant restart required!
 
-#### 2. Manuell (ohne HACS)
+#### 2. Manual (Without HACS)
 
 ```bash
 cd /config/custom_components
 git clone https://github.com/diestrohs/ha-evcc-scheduler.git
-# Home Assistant neu starten
+# Restart Home Assistant
 ```
 
-#### 3. Integration konfigurieren
+#### 3. Configure Integration
 
-Nach der Installation und dem Neustart von Home Assistant:
+After installation and Home Assistant restart:
 
-1. Gehe zu **Einstellungen** → **Geräte und Services** → **Integrationen**
-2. Klicke **"+ Integration erstellen"**
-3. Suche nach **"EVCC Scheduler"** und wähle aus
-4. Folge der Konfiguration:
-   - **Host**: IP oder Hostname von EVCC (z.B. `192.168.1.100`)
-   - **Port**: EVCC API Port (Default: `7070`)
-   - **Token**: Optional, falls EVCC Token-Auth hat
-   - **SSL**: An/Aus je nach EVCC-Setup
-   - **Timeout**: HTTP-Timeout in Sekunden (Default: `10`)
-   - **WebSocket-Modus**: An/Aus (Default: An - empfohlen)
+1. Go to: **Settings → Devices and Services**
+2. Click **+ Create Integration**
+3. Search for **"EVCC Scheduler"**
+4. Select it and enter:
+   - **Host**: EVCC IP address (e.g., `192.168.1.100`)
+   - **Port**: EVCC port (default: `7070`)
+   - **SSL/TLS**: Enable if EVCC uses HTTPS
+   - **Token**: If EVCC requires authentication
+   - **Timeout**: Request timeout in seconds (default: `10`)
+   - **Mode**: Connection mode (WebSocket or Polling)
 
-#### 4. Optional: Logging aktivieren
-
-Füge folgende Zeilen in `configuration.yaml` ein für Debugging:
-
-```yaml
-logger:
-  logs:
-    evcc_scheduler: debug
-    evcc_scheduler.api: debug
-    evcc_scheduler.coordinator: debug
-```
+5. Click **Submit** ✅
 
 ---
 
-## Architektur
+## Configuration
 
-```
-Integration-Startup
-        ↓
-__init__.py (async_setup_entry)
-    ├─→ api.py (REST-Client)
-    ├─→ coordinator.py (DataUpdateCoordinator)
-    │   └─→ Liest vehicleName aus loadpoints[]
-    ├─→ websocket_client.py (WS-Verbindung)
-    ├─→ websocket_api.py (WebSocket-API für UI)
-    ├─→ services.py (Service-Registrierung)
-    └─→ switch.py (Platform-Setup)
-           └─→ entity_manager.py (Entity-Lifecycle)
-                  └─→ mapping.py (ID-Generierung)
-```
+### Configuration Flow Options
 
-### Kernkomponenten
+| Option | Default | Description |
+|--------|---------|-------------|
+| **Host** | Required | EVCC hostname or IP address |
+| **Port** | 7070 | EVCC API port |
+| **SSL/TLS** | Disabled | Enable for HTTPS connections |
+| **Token** | (empty) | Authentication token if required |
+| **Timeout** | 10s | API request timeout |
+| **Mode** | WebSocket | Connection mode (WebSocket/Polling) |
 
-#### `api.py` - REST-Client
-- **Aufgabe**: HTTP-Kommunikation mit EVCC
-- **Methoden**:
-  - `get_state()`: Holt kompletten EVCC-State
-  - `get_repeating_plans(vehicle_id)`: Liste der Pläne eines Fahrzeugs
-  - `set_repeating_plans(vehicle_id, plans)`: Speichert alle Pläne
-- **Fehlerbehandlung**: `raise_for_status()` wirft Exceptions bei HTTP-Fehlern
+### WebSocket vs. Polling
 
-#### `coordinator.py` - Data Update Coordinator
-- **Aufgabe**: Zentrale Datenquelle, 30s Polling
-- **Fahrzeugauswahl**: Iteriert `state["loadpoints"][]`, sucht `vehicleName`
-- **Datenstruktur**:
-  ```python
-  {
-    "vehicles": {
-      "db:1": {
-        "title": "Elroq",
-        "repeatingPlans": [
-          {"time": "07:00", "weekdays": [1,2,3], "soc": 80, "active": True},
-          ...
-        ]
-      }
-    },
-    "id_map": {"db:1": "Elroq"}
-  }
-  ```
-- **Verhalten bei Fahrzeugwechsel**: `wanted_ids` ändert sich → Entity Manager löscht alte Entities
+- **WebSocket (Recommended)**: Real-time updates, lower latency
+  - Requires EVCC 0.210.2+
+  - Automatic reconnection with exponential backoff
+  - Fallback to polling if connection lost
 
-#### `websocket_client.py` - WebSocket-Verbindung
-- **Aufgabe**: Persistente WS-Verbindung zu EVCC
-- **Reconnect-Logik**: 5s exponentieller Backoff bei Fehlern
-- **Callback**: Triggert `coordinator.async_request_refresh()` bei neuen Nachrichten
-- **Non-Blocking**: Läuft in separatem Task, blockiert nicht den HA Event Loop
-
-#### `entity_manager.py` - Entity-Lifecycle
-- **Aufgabe**: Synchronisiert Entities mit Coordinator-Daten
-- **Sync-Prozess**:
-  1. Vergleicht `wanted_ids` (aus Plänen) mit `current_ids` (in `self.entities`)
-  2. Neue Entities: Erstellen und registrieren
-  3. Bestehende Entities: Plan-Daten aktualisieren
-  4. Entfernte Entities: Aus Dictionary entfernen + aus Registry löschen
-- **Registry-Cleanup**: `async_remove()` bei jedem unload + bei async_unload_entry()
-
-#### `switch.py` - Switch Platform
-- **Entität**: `EvccPlanSwitch` für jeden Plan
-- **Attribute**: Plan-Details als `extra_state_attributes()`
-- **Toggle**: `async_turn_on/off()` → API-Aufruf → `coordinator.async_request_refresh()`
-- **1-basierte Indexierung**: UI zeigt Plan 1,2,3; Array ist 0-indexed
-
-#### `services.py` - Service-Registrierung
-- **Services**:
-  - `evcc_scheduler.set_repeating_plan`
-  - `evcc_scheduler.del_repeating_plan`
-  - `evcc_scheduler.toggle_plan_active`
-- **Validierung**: Prüft Fahrzeug-ID, Verfügbarkeit, Plan-Index
-- **Fehlerbehandlung**: `ServiceValidationError` mit aussagekräftigen Meldungen
-
-#### `mapping.py` - Hilfsfunktionen
-- `extract_plans()`: Konvertiert EVCC-State zu vehicles-Dict
-- `build_entity_id()`: Generiert eindeutige Entity-IDs
-  - Format: `evcc_{fahrzeug}_{index}`
-  - Beispiel: `evcc_elroq_repeating_plan_01`
-
-#### `websocket_api.py` - WebSocket-API für Custom Card
-- **Aufgabe**: Ermöglicht Custom Lovelace Card, Daten zu holen
-- **Commands**:
-  - `type: "scheduler/get"`: Holt Fahrzeug + Pläne
-  - `type: "scheduler/add"`: Neuen Plan anlegen
-  - `type: "scheduler/edit"`: Plan bearbeiten
-  - `type: "scheduler/deleate"`: Plan löschen (Typo ist absichtlich für Kompatibilität)
-- **Broadcast**: Sendet `plans_updated` Event an alle WS-Clients
-
-#### `__init__.py` - Integration-Setup
-- **Setup**: `async_setup_entry()` registriert Coordinator, WS, Services
-- **Unload**: `async_unload_entry()` entfernt alle Entities aus Registry
-- **Registry-Cleanup**: Vor dem Unload werden alle Entities dieser Integration entfernt
+- **Polling**: Updates every 30 seconds
+  - Works with older EVCC versions
+  - Higher latency, slightly higher CPU usage
 
 ---
 
-## Services
+## Usage
 
-### `evcc_scheduler.set_repeating_plan`
+### Available Entities
 
-**Beschreibung**: Erstelle oder aktualisiere einen wiederkehrenden Ladeplan
+#### Switch Platform
 
-**Parameter**:
+For each repeating plan, a switch entity is created:
+- **Entity ID Format**: `switch.{vehicle}_{plan_number}` (1-based)
+- **Example**: `switch.tesla_plan_01`, `switch.tesla_plan_02`
+
+#### Switch Attributes
+
 ```yaml
-service: evcc_scheduler.set_repeating_plan
-data:
-  vehicle_id: "db:1"           # Fahrzeug-ID (erforderlich)
-  plan_index: 1                # Optional: 1-basiert, null = neuer Plan anhängen
-  time: "07:00"                # Startzeit (HH:MM)
-  weekdays: [1, 2, 3, 4, 5]    # Wochentage (1=Mo, 7=So)
-  soc: 80                       # Ladeziel in % (10-100)
-  active: true                  # Plan aktiv/inaktiv
+name: "Plan 1"           # User-friendly name
+active: true             # Plan is active (toggleable)
+time: "07:00"            # Start time
+weekdays: [1,2,3,4,5]   # Days of week (1=Monday, 7=Sunday)
+soc: 80                  # Target state of charge (%)
 ```
 
-**Fehlerbehandlung**:
-| Fehler | Meldung |
-|--------|---------|
-| Kein Fahrzeug gewählt | "Kein Fahrzeug in EVCC gewählt" |
-| Fahrzeug-ID falsch | "Die Fahrzeug-ID 'db:1' stimmt nicht mit der gewählten Fahrzeug-ID in EVCC 'db:2' überein" |
-| Fahrzeug nicht angelegt | "Das Fahrzeug 'db:99' ist in EVCC nicht angelegt. Verfügbare Fahrzeuge: db:1, db:2" |
-| Plan-Index ungültig | "Plan-Index 99 ungültig" |
+### Available Services
 
-**Beispiele**:
+#### `evcc_scheduler.set_repeating_plan`
 
-Neuen Plan erstellen:
+Create or update a repeating charging plan.
+
+**Service Call Example:**
+
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
-  vehicle_id: "db:1"
-  time: "22:00"
+  vehicle_id: "vehicle:0"
+  plan_index: 1
+  time: "07:00"
   weekdays: [1, 2, 3, 4, 5]
-  soc: 100
+  soc: 80
   active: true
 ```
 
-Existierenden Plan aktualisieren:
-```yaml
-service: evcc_scheduler.set_repeating_plan
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-  soc: 90
-```
+**Parameters:**
 
-### `evcc_scheduler.del_repeating_plan`
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vehicle_id` | string | Yes | Vehicle ID from EVCC |
+| `plan_index` | integer | Yes | Plan number (1-based) |
+| `time` | string | Yes | Time in HH:MM format (24h) |
+| `weekdays` | array | Yes | Days: [1=Mon, 2=Tue, ..., 7=Sun] |
+| `soc` | integer | Yes | Target SOC: 1-100 (%) |
+| `active` | boolean | No | Default: `true` |
 
-**Beschreibung**: Lösche einen wiederkehrenden Ladeplan
+**Response:**
 
-**Parameter**:
+- ✅ Success: Plan created/updated
+- ❌ Error: Vehicle not found, invalid index, etc.
+
+---
+
+#### `evcc_scheduler.del_repeating_plan`
+
+Delete a specific repeating plan.
+
+**Service Call Example:**
+
 ```yaml
 service: evcc_scheduler.del_repeating_plan
 data:
-  vehicle_id: "db:1"        # Fahrzeug-ID (erforderlich)
-  plan_index: 1             # Plan-Index 1-basiert (erforderlich)
-```
-
-**Fehlerbehandlung**: Identisch mit `set_repeating_plan`
-
-**Beispiel**:
-```yaml
-service: evcc_scheduler.del_repeating_plan
-data:
-  vehicle_id: "db:1"
-  plan_index: 2
-```
-
-### `evcc_scheduler.toggle_plan_active`
-
-**Beschreibung**: Schalte Plan aktiv/inaktiv oder toggle
-
-**Parameter**:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"        # Fahrzeug-ID (erforderlich)
-  plan_index: 1             # Plan-Index 1-basiert (erforderlich)
-  active: true              # Optional: true/false setzen, null = toggle
-```
-
-**Beispiele**:
-
-Plan aktivieren:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"
+  vehicle_id: "vehicle:0"
   plan_index: 1
-  active: true
 ```
 
-Plan deaktivieren:
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vehicle_id` | string | Yes | Vehicle ID from EVCC |
+| `plan_index` | integer | Yes | Plan number to delete |
+
+---
+
+#### `evcc_scheduler.toggle_plan_active`
+
+Toggle the active status of a plan.
+
+**Service Call Example:**
+
 ```yaml
 service: evcc_scheduler.toggle_plan_active
 data:
-  vehicle_id: "db:1"
+  vehicle_id: "vehicle:0"
   plan_index: 1
   active: false
 ```
 
-Plan toggle:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-```
-
 ---
 
-## Datenfluss
+## Debugging & Troubleshooting
 
-### Startup-Prozess
+### Enable Debug Logging
 
-```
-1. async_setup_entry() aufgerufen
-   ↓
-2. API, Coordinator, WebSocket initialisiert
-   ↓
-3. coordinator.async_config_entry_first_refresh()
-   ├─ _async_update_data() aufgerufen
-   ├─ Liest vehicleName aus loadpoints[]
-   └─ Lädt Pläne für aktives Fahrzeug
-   ↓
-4. switch.py setup_platform() aufgerufen
-   ├─ Erstellt Entity Manager
-   └─ Registriert sync() Callback
-   ↓
-5. entity_manager.sync() aufgerufen
-   ├─ build_entity_id() für jeden Plan
-   └─ async_add_entities() registriert Entities
-   ↓
-6. WebSocket verbunden, Services registriert
-   ↓
-✅ Integration ready
-```
-
-### Fahrzeugwechsel (Elroq → Eniaq)
-
-```
-1. Nutzer wählt Eniaq in EVCC UI
-   ↓
-2. EVCC setzt loadpoints[0].vehicleName = "db:2"
-   ↓
-3. WebSocket-Nachricht von EVCC empfangen
-   ↓
-4. websocket_client.py → coordinator.async_request_refresh()
-   ↓
-5. _async_update_data() lädt db:2 statt db:1
-   ├─ wanted_ids = {evcc_eniaq_repeating_plan_01, evcc_eniaq_repeating_plan_02}
-   └─ current_ids = {evcc_elroq_repeating_plan_01, evcc_elroq_repeating_plan_02}
-   ↓
-6. entity_manager.sync()
-   ├─ Löscht evcc_elroq_repeating_plan_* aus entities dict
-   ├─ async_remove() aus Registry
-   ├─ Erstellt evcc_eniaq_repeating_plan_* neu
-   └─ async_add_entities() registriert neue Entities
-   ↓
-✅ Eniaq-Pläne sichtbar, Elroq-Entities gelöscht
-```
-
-### Service-Aufruf (set_repeating_plan)
-
-```
-1. User-Service-Aufruf mit vehicle_id="db:1"
-   ↓
-2. services.py: set_repeating_plan() aufgerufen
-   ├─ Holt EVCC-State
-   ├─ Prüft vehicleName in loadpoints[]
-   ├─ Validiert Fahrzeug-ID, Verfügbarkeit, Index
-   └─ Wirft ServiceValidationError bei Fehler
-   ↓
-3. API: get_repeating_plans("db:1")
-   ↓
-4. Modifiziert plans Array lokal
-   ↓
-5. API: set_repeating_plans("db:1", plans)
-   ↓
-6. coordinator.async_request_refresh()
-   ├─ Lädt aktualisierte Daten
-   └─ entity_manager.sync() aktualisiert Entities
-   ↓
-7. WebSocket: _broadcast_plans_updated()
-   ├─ Sendet Event an alle WS-Clients
-   └─ Custom Card aktualisiert UI
-   ↓
-✅ Service erfolgreich, Daten synchronisiert
-```
-
-### Home Assistant Neustart
-
-```
-1. HA wird heruntergefahren
-   ↓
-2. async_unload_entry() aufgerufen
-   ├─ Lädt entity_registry
-   ├─ Findet alle Entities mit config_entry_id
-   └─ async_remove() alle Entities
-   ↓
-3. HA wird hochgefahren
-   ↓
-4. async_setup_entry() aufgerufen (wie Startup)
-   ├─ Neue Entities nur für aktuell gewähltes Fahrzeug
-   └─ Registry clean, keine Zombies
-   ↓
-✅ Sauberer Start
-```
-
----
-
-## Entity-Indizes und Namenskonvention
-
-### 1-basierte UI, 0-basierte Arrays
-
-| Kontext | Indexierung | Beispiel |
-|---------|-------------|----------|
-| Home Assistant Entity-Name | 1-basiert | `evcc_elroq_repeating_plan_01`, `_02`, `_03` |
-| Entity-ID in UI/Services | 1-basiert | Plan 1, Plan 2, Plan 3 |
-| EVCC JSON Array | 0-basiert | `plans[0]`, `plans[1]`, `plans[2]` |
-| Interner Code | 0-basiert für Arrays | `idx = plan_index - 1` |
-
-**Kritisch**: Service-Parameter sind 1-basiert, müssen intern zu 0-basiert konvertiert werden!
-
-```python
-# In services.py:
-plan_index = call.data.get("plan_index")  # 1-basiert von Nutzer
-idx = int(plan_index) - 1                 # Konvertiert zu 0-basiert
-plans[idx] = {...}                        # Aktualisiert korrekten Plan
-```
-
-### Entity-ID Generation
-
-```python
-# Aus mapping.py:
-def build_entity_id(vehicle_id: str, index: int, title: str = None) -> str:
-    base = title if title else vehicle_id
-    safe_name = base.lower().replace(":", "_").replace("-", "_").replace(" ", "_")
-    return f"evcc_{safe_name}_repeating_plan_{index:02d}"
-
-# Beispiele:
-build_entity_id("db:1", 1, "Elroq")    # "evcc_elroq_repeating_plan_01"
-build_entity_id("db:2", 1, "Eniaq")    # "evcc_eniaq_repeating_plan_01"
-build_entity_id("car-001", 3, "Tesla") # "evcc_tesla_repeating_plan_03"
-```
-
----
-
-## Konfiguration
-
-### Manifesto (manifest.json)
-
-```json
-{
-  "domain": "evcc_scheduler",
-  "name": "EVCC Scheduler",
-  "version": "0.0.4",
-  "documentation": "https://github.com/...",
-  "requirements": [],
-  "codeowners": ["@username"],
-  "config_flow": true,
-  "iot_class": "local_polling",
-  "integration_type": "service",
-  "platforms": ["switch"],
-  "homeassistant": "2025.12.0"
-}
-```
-
-### Const (const.py)
-
-```python
-DOMAIN = "evcc_scheduler"
-DEFAULT_PORT = 7070
-DEFAULT_TIMEOUT = 10
-CONF_TIMEOUT = "timeout"
-CONF_SSL = "ssl"
-CONF_MODE = "mode"
-MODE_WEBSOCKET = "websocket"
-MODE_POLLING = "polling"
-```
-
----
-
-## Logging und Debugging
-
-### Logging aktivieren
+Add to `configuration.yaml`:
 
 ```yaml
-# configuration.yaml
 logger:
   logs:
     evcc_scheduler: debug
     evcc_scheduler.api: debug
     evcc_scheduler.coordinator: debug
-    evcc_scheduler.websocket_client: debug
-    evcc_scheduler.entity_manager: debug
+    evcc_scheduler.websocket: debug
 ```
 
-### Wichtige Log-Messages
+Restart Home Assistant and check logs in **Settings → System → Logs**.
 
-| Log-Level | Beispiel | Bedeutung |
-|-----------|----------|-----------|
-| DEBUG | `Found active vehicle in loadpoint: db:1` | Fahrzeug erkannt |
-| INFO | `Loaded 3 plans for active vehicle: Elroq` | Plans geladen |
-| INFO | `Created plan entity: evcc_elroq_repeating_plan_01` | Entity erstellt |
-| INFO | `Removing plan entity: evcc_elroq_repeating_plan_02` | Entity gelöscht |
-| WARNING | `Vehicle db:99 not found in EVCC vehicles data` | Fahrzeug nicht vorhanden |
-| ERROR | `Failed to create entity xyz: ...` | Entity-Erstellung fehlgeschlagen |
+### Common Issues
 
-### Debugging-Tipps
+#### 1. "Integration Not Found"
 
-1. **WebSocket-Verbindung prüfen**:
-   ```bash
-   wscat -c ws://192.168.1.100:7070/ws
-   ```
+**Symptom**: Integration doesn't appear in list
+**Solution**:
+- Ensure HACS custom repository is added correctly
+- Clear browser cache (Ctrl+Shift+Delete)
+- Home Assistant restart required
 
-2. **API testen**:
-   ```bash
-   curl http://192.168.1.100:7070/api/state | jq '.loadpoints[0].vehicleName'
-   curl http://192.168.1.100:7070/api/vehicles/db:1/plan/repeating
-   ```
+#### 2. "Connection Refused"
 
-3. **Entities prüfen**:
-   - Einstellungen → Geräte und Services → Entities
-   - Filtern: `evcc_`
+**Symptom**: `[Errno 111] Connection refused`
+**Solution**:
+- Verify EVCC host and port (default: 7070)
+- Check firewall/network connectivity
+- Test: `curl http://192.168.1.100:7070/api/state`
 
-4. **Registry-Probleme**:
-   ```bash
-   # Manuelle Registry-Bereinigung (nur notfalls!)
-   rm /config/.storage/core.entity_registry
-   # HA-Neustart erforderlich
-   ```
+#### 3. "No Entities Appear"
 
----
+**Symptom**: Integration installed but no switch entities
+**Solution**:
+- Check EVCC has at least one repeating plan
+- Enable debug logging and check logs
+- Verify vehicle_id format (e.g., `vehicle:0`)
 
-## Fehlerbehandlung
+#### 4. "WebSocket Connection Failed"
 
-### Häufige Fehler
+**Symptom**: WebSocket errors in logs
+**Solution**:
+- Switch to Polling mode temporarily
+- Update EVCC to 0.210.2+
+- Check WebSocket endpoint: `ws://host:7070/ws`
 
-#### "Custom element doesn't exist: repeating-scheduler-card"
-- **Ursache**: Custom Card nicht installiert oder falsche Imports
-- **Lösung**: Card-Repository separat klonen, relative Imports auf absolute umstellen
+#### 5. "Entity Not Updating"
 
-#### "Kein Fahrzeug in EVCC gewählt"
-- **Ursache**: `vehicleName` ist leer
-- **Lösung**: In EVCC Fahrzeug an Ladestation anschließen oder auswählen
+**Symptom**: Switch doesn't reflect plan changes
+**Solution**:
+- Force coordinator refresh via UI (reload integration)
+- Check WebSocket connection status
+- Verify EVCC API responds correctly: `curl http://host:7070/api/state`
 
-#### "Fahrzeug-ID stimmt nicht überein"
-- **Ursache**: Service-Aufruf mit falscher Fahrzeug-ID
-- **Lösung**: Korrekte ID aus Logs oder Entities verwenden
+### Testing EVCC Connectivity
 
-#### Entity Registry überwachsen
-- **Ursache**: Nach Update alte Entities nicht gelöscht
-- **Lösung**: `async_unload_entry()` testet - manuell sync() aufrufen
+```bash
+# Test REST API
+curl http://192.168.1.100:7070/api/state | jq '.vehicles'
 
-#### WebSocket verbindet sich nicht
-- **Ursache**: EVCC offline, Port falsch, Firewall
-- **Lösung**: Polling-Fallback greift nach 30s, logs prüfen
+# Test WebSocket endpoint
+wscat -c ws://192.168.1.100:7070/ws
+
+# View repeating plans
+curl http://192.168.1.100:7070/api/vehicles/vehicle:0/plan/repeating
+```
 
 ---
 
-## Technische Spezifikationen
+## Development
 
-### EVCC API-Anforderungen
+### Repository Structure
 
-**Endpoints**:
-- `GET /api/state` - Kompletter State
-- `GET /api/vehicles/{id}/plan/repeating` - Pläne eines Fahrzeugs
-- `POST /api/vehicles/{id}/plan/repeating` - Pläne setzen
-- `ws://{host}:{port}/ws` - WebSocket
+```
+custom_components/evcc_scheduler/
+├── __init__.py                 # Integration setup
+├── api.py                      # REST/WebSocket API client
+├── config_flow.py              # Configuration UI
+├── const.py                    # Constants (domain, ports, etc.)
+├── coordinator.py              # DataUpdateCoordinator
+├── entity_manager.py           # Dynamic entity lifecycle
+├── mapping.py                  # Data extraction & mapping
+├── services.py                 # Service registration
+├── services.yaml               # Service definitions
+├── switch.py                   # Switch platform
+├── websocket_api.py            # Custom Card API
+├── websocket_client.py         # WebSocket connection
+├── manifest.json               # Integration manifest
+├── hacs.json                   # HACS configuration
+├── translations/               # i18n files
+│   ├── de.json                 # German
+│   └── en.json                 # English
+└── www/                        # Custom card assets (optional)
+```
 
-**State-Struktur**:
-```json
+### Key Data Structures
+
+**Coordinator Data:**
+
+```python
 {
-  "loadpoints": [
-    {
-      "vehicleName": "db:1",
-      "vehicleTitle": "Elroq",
-      "connected": true,
-      ...
-    }
-  ],
-  "vehicles": {
-    "db:1": {
-      "title": "Elroq",
-      "repeatingPlans": [
-        {
-          "time": "07:00",
-          "weekdays": [1, 2, 3, 4, 5],
-          "soc": 80,
-          "active": true
+    "vehicles": {
+        "vehicle:123": {
+            "title": "Tesla Model 3",
+            "repeatingPlans": [
+                {
+                    "time": "07:00",
+                    "weekdays": [1, 2, 3, 4, 5],
+                    "soc": 80,
+                    "active": True
+                }
+            ]
         }
-      ]
     }
-  }
 }
 ```
 
-### Performance
+**Plan Indexing:**
+- EVCC: 0-based array (`plans[0]`, `plans[1]`)
+- Home Assistant UI: 1-based entity names (`plan_01`, `plan_02`)
+- Services: 1-based parameters (user-friendly)
 
-| Metrik | Wert | Notiz |
-|--------|------|-------|
-| Polling-Intervall | 30s | Konfigurierbar, Standard 30 |
-| WebSocket-Reconnect | 5s backoff | Exponentiell bis max 5 Versuche |
-| HTTP Timeout | 10s | In config_flow konfigurierbar |
-| Entity-Sync Zeit | <100ms | Schneller als Coordinator-Update |
-| Memory pro Fahrzeug | ~5KB | Minimal (nur Pläne im RAM) |
+### Contributing
 
-### Kompatibilität
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-| Komponente | Anforderung | Getestet |
-|------------|-------------|-------------|
-| Home Assistant | 2025.12+ | 2025.12 ✅ |
-| EVCC | 0.210.2+ | 0.210.2 ✅ |
-| Python | 3.11+ | 3.12 ✅ |
-| aiohttp | 3.8+ | 3.9+ ✅ |
-| asyncio | Standard Library | ✅ |
+### Testing
+
+No automated test suite yet. Manual testing:
+
+1. Use Home Assistant UI → Developer Tools → Services
+2. Call services with test data
+3. Check entity updates
+4. Verify logs (DEBUG mode)
 
 ---
 
-## Beitragen und Entwicklung
+## Changelog
 
-### Entwicklungs-Setup
-
-```bash
-git clone https://github.com/[username]/evcc_scheduler.git
-cd evcc_scheduler
-pip install -e .
-```
-
-### Tests ausführen
-
-```bash
-# Derzeit keine automatisierten Tests
-# Manuelles Testen erforderlich:
-# 1. EVCC starten
-# 2. HA starten mit custom_components/evcc_scheduler
-# 3. Integration konfigurieren
-# 4. Services über Developer Tools testen
-```
-
-### Code-Stil
-
-- Python: PEP 8
-- Imports: Standard → Drittparteien → Home Assistant → Lokal
-- Type-Hints: Für alle Funktionen
-- Logging: Verwende `_LOGGER` mit `debug`, `info`, `warning`, `error`
-
-### Pull Request Checklist
-
-- [ ] Funktion implementiert und getestet
-- [ ] Logging hinzugefügt (debug-Level)
-- [ ] Type-Hints aktualisiert
-- [ ] Fehlerbehandlung berücksichtigt
-- [ ] README/DOCUMENTATION aktualisiert
-- [ ] Keine Breaking Changes ohne Versionsbump
+See [CHANGELOG.md](./CHANGELOG.md) for version history and release notes.
 
 ---
 
-## Lizenz
+## Support
 
-MIT License - Siehe LICENSE Datei
-
----
-
-## Kontakt & Support
-
-- **Issues**: GitHub Issues
-- **Diskussionen**: GitHub Discussions
-- **Lovelace Card**: Separates Repository (Link folgt)
+- 🐛 [Report Bugs](https://github.com/diestrohs/ha-evcc-scheduler/issues)
+- 💬 [Discussions](https://github.com/diestrohs/ha-evcc-scheduler/discussions)
+- 📚 [Documentation](https://github.com/diestrohs/ha-evcc-scheduler)
 
 ---
 
-**Zuletzt aktualisiert**: 20. Januar 2026  
-**Version**: 0.0.4
+## License
+
+MIT License - See [LICENSE](./LICENSE) for details.
+
+---
+
+**Last Updated**: January 21, 2026  
+**Version**: 0.0.4  
+**Maintainer**: [@diestrohs](https://github.com/diestrohs)

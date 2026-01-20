@@ -59,7 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions CI/CD validation workflow
 - Comprehensive documentation:
   - User guide (README.md)
-  - Technical documentation (DOCUMENTATION.md)
+  - Technical documentation (DOCUMENTATION.md - English)
+  - German documentation (DOCUMENTATION_DE.md)
   - HACS-specific installation guide
   - Contribution guidelines
   - Code of Conduct (Contributor Covenant v2.1)

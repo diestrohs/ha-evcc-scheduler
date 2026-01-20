@@ -30,7 +30,8 @@
 
 ### Dokumentation
 - [x] `README.md` - Übersicht, Installation, Verwendung
-- [x] `DOCUMENTATION.md` - Technische Dokumentation
+- [x] `DOCUMENTATION.md` - Technical documentation (English)
+- [x] `DOCUMENTATION_DE.md` - German documentation
 - [x] `CONTRIBUTING.md` - Beitragsrichtlinien
 - [x] `CODE_OF_CONDUCT.md` - Verhaltensrichtlinien
 - [x] `LICENSE` - MIT Lizenz
@@ -115,7 +116,8 @@ evcc_scheduler/
 │   │   └── en.json
 │   └── www/                      ✅ (Custom Card - separates Repo)
 ├── README.md                      ✅
-├── DOCUMENTATION.md               ✅
+├── DOCUMENTATION.md               ✅ (English)
+├── DOCUMENTATION_DE.md            ✅ (German)
 ├── HACS_INSTALL.md                ✅
 ├── CONTRIBUTING.md                ✅
 ├── CODE_OF_CONDUCT.md             ✅
