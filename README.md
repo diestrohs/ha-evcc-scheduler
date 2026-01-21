@@ -38,7 +38,7 @@ Home Assistant integration for managing EV charging schedules via EVCC API.
 
 ### Usage
 
-- Switch entities appear as `switch.{vehicle}_plan_0{n}`
+- Switch entities appear as `switch.evcc_{vehicle}_repeating_plan_0{n}`
 - Toggle plans directly in Home Assistant UI
 - Use services to create/update/delete plans
 

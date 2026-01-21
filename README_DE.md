@@ -39,7 +39,7 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
 
 ### Verwendung
 
-- Switch-Entities erscheinen als `switch.{fahrzeug}_plan_0{n}`
+- Switch-Entities erscheinen als `switch.evcc_{fahrzeug}_repeating_plan_0{n}`
 - Schalte Pläne direkt in der Home Assistant UI
 - Nutze Services zum Erstellen/Aktualisieren/Löschen von Plänen
 
