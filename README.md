@@ -66,7 +66,7 @@ Create or update charging plan.
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
-  vehicle_id: "vehicle:0"
+  vehicle_id: "db:1"
   plan_index: 1
   time: "07:00"
   weekdays: [1, 2, 3, 4, 5]
@@ -81,7 +81,7 @@ Delete charging plan.
 ```yaml
 service: evcc_scheduler.del_repeating_plan
 data:
-  vehicle_id: "vehicle:0"
+  vehicle_id: "db:1"
   plan_index: 1
 ```
 
@@ -92,7 +92,7 @@ Toggle plan active status.
 ```yaml
 service: evcc_scheduler.toggle_plan_active
 data:
-  vehicle_id: "vehicle:0"
+  vehicle_id: "db:1"
   plan_index: 1
   active: false
 ```
