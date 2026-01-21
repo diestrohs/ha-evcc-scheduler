@@ -6,7 +6,7 @@ CONF_TOKEN = "token"
 CONF_SSL = "ssl"
 CONF_TIMEOUT = "timeout"
 CONF_MODE = "mode"
-CONF_WS_API = "ws_api"
+CONF_WS_API = "websocket_api"
 
 MODE_POLLING = "polling"
 MODE_WEBSOCKET = "websocket"
