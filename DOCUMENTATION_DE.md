@@ -241,6 +241,16 @@ data:
   active: true                  # Plan aktiv/inaktiv
 ```
 
+**Pflicht-/Optionale Felder**:
+| Feld | Pflicht? | Hinweis |
+|------|----------|---------|
+| `vehicle_id` | Ja | EVCC Fahrzeug-ID (z.B. `db:1`) |
+| `plan_index` | Nein | 1-basiert; wenn weggelassen/0 → Plan wird angehängt |
+| `time` | Ja | HH:MM (24h) |
+| `weekdays` | Ja | Liste 1-7 (1=Mo … 7=So) |
+| `soc` | Ja | Ziel-SOC in % (10-100) |
+| `active` | Nein | true/false, Standard: true |
+
 **Fehlerbehandlung**:
 | Fehler | Meldung |
 |--------|---------|
@@ -283,6 +293,12 @@ data:
   plan_index: 1             # Plan-Index 1-basiert (erforderlich)
 ```
 
+**Pflicht-/Optionale Felder**:
+| Feld | Pflicht? | Hinweis |
+|------|----------|---------|
+| `vehicle_id` | Ja | EVCC Fahrzeug-ID (z.B. `db:1`) |
+| `plan_index` | Ja | 1-basiert, muss existieren |
+
 **Fehlerbehandlung**: Identisch mit `set_repeating_plan`
 
 **Beispiel**:
@@ -305,6 +321,13 @@ data:
   plan_index: 1             # Plan-Index 1-basiert (erforderlich)
   active: true              # Optional: true/false setzen, null = toggle
 ```
+
+**Pflicht-/Optionale Felder**:
+| Feld | Pflicht? | Hinweis |
+|------|----------|---------|
+| `vehicle_id` | Ja | EVCC Fahrzeug-ID (z.B. `db:1`) |
+| `plan_index` | Ja | 1-basiert, muss existieren |
+| `active` | Nein | Wenn weggelassen → toggle; sonst true/false setzen |
 
 **Beispiele**:
 
