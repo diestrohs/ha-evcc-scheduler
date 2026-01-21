@@ -1,4 +1,4 @@
-"""WebSocket API für EVCC Scheduler Custom-Card"""
+"""WebSocket API für EVCC Scheduler Custom-Card (experimentell/ungestestet)."""
 import asyncio
 import json
 import logging

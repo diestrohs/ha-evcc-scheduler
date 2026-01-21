@@ -10,6 +10,7 @@ Home Assistant integration for managing EV charging schedules via EVCC API.
 - 🎛️ **Switch Entities**: Toggle plans directly from Home Assistant UI
 - 🌍 **Multi-Language**: German & English support
 - 📱 **Custom Card Ready**: WebSocket API for advanced UI integration
+- 🧪 **Experimental Custom Card WS API**: Disabled by default, opt-in via config checkbox (untested)
 - ✅ **HACS Compatible**: Install via Home Assistant Community Store
 
 ## Quick Start
@@ -32,6 +33,7 @@ Home Assistant integration for managing EV charging schedules via EVCC API.
    - Host: `192.168.1.100` (EVCC IP)
    - Port: `7070` (default)
    - Token: (if required)
+  - Custom Card WS API (experimental): enable if you need the card API (untested)
 5. Click **Submit** ✅
 
 ### Usage

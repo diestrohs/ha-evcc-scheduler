@@ -10,6 +10,7 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
 - 🎛️ **Switch-Entities**: Schalte Pläne direkt aus der Home Assistant UI
 - 🌍 **Mehrsprachig**: Deutsch & Englisch Support
 - 📱 **Custom Card Ready**: WebSocket API für erweiterte UI-Integration
+- 🧪 **Experimentelle Custom Card WS-API**: Standardmäßig aus, optional per Checkbox aktivierbar (nicht getestet)
 - ✅ **HACS-kompatibel**: Installation über Home Assistant Community Store
 
 ## Quick Start
@@ -33,6 +34,7 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
    - Host: `192.168.1.100` (EVCC IP)
    - Port: `7070` (Standard)
    - Token: (falls erforderlich)
+  - Custom Card WS API (experimentell): aktivieren, wenn die Card-API benötigt wird (noch ungetestet)
 5. Klicke **Absenden** ✅
 
 ### Verwendung

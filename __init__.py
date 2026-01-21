@@ -3,7 +3,7 @@ from .coordinator import EvccCoordinator
 from .websocket_client import EvccWebsocketClient
 from .websocket_api import EvccWebSocketAPI, async_register_ws_commands
 from .services import async_setup_services
-from .const import DOMAIN, DEFAULT_PORT
+from .const import DOMAIN, DEFAULT_PORT, CONF_WS_API, DEFAULT_WS_API
 import logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -14,6 +14,7 @@ PLATFORMS = ["switch"]
 async def async_setup_entry(hass, entry):
     host = entry.data["host"]
     port = entry.data.get("port", DEFAULT_PORT)
+    ws_api_enabled = entry.data.get(CONF_WS_API, DEFAULT_WS_API)
 
     api = EvccApiClient(host, port)
     coordinator = EvccCoordinator(hass, api)
@@ -26,10 +27,14 @@ async def async_setup_entry(hass, entry):
     await ws.connect()
     _LOGGER.info("EVCC WebSocket client connected for instant updates")
 
-    # Setup WebSocket API für Custom-Card
-    ws_api = EvccWebSocketAPI(hass)
-    hass.data.setdefault("evcc_scheduler_ws_api", ws_api)
-    async_register_ws_commands(hass)
+    # Setup WebSocket API für Custom-Card (experimentell/ungestestet)
+    if ws_api_enabled:
+        ws_api = EvccWebSocketAPI(hass)
+        hass.data.setdefault("evcc_scheduler_ws_api", ws_api)
+        async_register_ws_commands(hass)
+        _LOGGER.info("Custom Card WebSocket API enabled (experimental/untested)")
+    else:
+        _LOGGER.info("Custom Card WebSocket API disabled (experimental/untested)")
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     coordinator.ws = ws

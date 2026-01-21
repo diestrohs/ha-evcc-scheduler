@@ -109,6 +109,7 @@ Nach der Installation und dem Neustart von Home Assistant:
    - **SSL**: An/Aus je nach EVCC-Setup
    - **Timeout**: HTTP-Timeout in Sekunden (Default: `10`)
    - **WebSocket-Modus**: An/Aus (Default: An - empfohlen)
+  - **Custom Card WebSocket API (experimentell/ungestet)**: Standardmäßig AUS; nur aktivieren, wenn die Custom Card WS-API benötigt wird
 
 #### 4. Optional: Logging aktivieren
 
