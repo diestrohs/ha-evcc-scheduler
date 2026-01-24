@@ -6,7 +6,7 @@
   "documentation": "https://github.com/yourusername/evcc_scheduler",
   "issue_tracker": "https://github.com/yourusername/evcc_scheduler/issues",
   "requirements": ["aiohttp>=3.8.0"],
-  "version": "0.0.5",
+  "version": "0.1.0",
   "homeassistant": "2025.12.0",
   "iot_class": "local_polling",
   "integration_type": "service",

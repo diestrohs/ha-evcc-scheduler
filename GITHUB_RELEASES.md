@@ -15,8 +15,8 @@ MAJOR.MINOR.PATCH
 ### Aktuelle Version
 
 ```
-0.0.4
-└─ Pre-Release Phase (0.x.x)
+0.1.0
+└─ First stable (0.x)
 ```
 
 ## Version Roadmap
@@ -27,8 +27,8 @@ MAJOR.MINOR.PATCH
 | 0.0.2 | ✅ Veröffentlicht | WebSocket-Unterstützung, Entity Manager |
 | 0.0.3 | ✅ Veröffentlicht | Services (set/del), Fehlerbehandlung |
 | 0.0.4 | ✅ Veröffentlicht | Entity-ID Vereinfachung, Optimierungen |
-| 0.0.5 | 📋 Geplant | HACS Default Store, Home Assistant Brands |
-| 0.1.0 | 🚀 Ziel | Stable Release, volle Stabilität |
+| 0.0.5 | ✅ Veröffentlicht | HACS Default Store, Home Assistant Brands |
+| 0.1.0 | ✅ Veröffentlicht | Stable Release, WS/Polling Konfiguration, WS API |
 
 ## Release-Prozess
 
@@ -47,7 +47,7 @@ Vor jedem Release:
 
 # manifest.json updaten
 {
-  "version": "0.0.5"
+  "version": "0.1.0"
 }
 
 # hacs.json hat keine Version (kommt aus manifest.json)
@@ -58,9 +58,9 @@ Vor jedem Release:
 **Via GitHub Web UI**:
 
 1. Repository → Releases → Draft a new release
-2. **Tag**: `0.0.5` (exakt mit manifest.json)
-3. **Target**: `main` (oder default branch)
-4. **Title**: `Release 0.0.5`
+2. **Tag**: `0.1.0` (exakt mit manifest.json)
+3. **Target**: `master` (default branch)
+4. **Title**: `Release 0.1.0`
 5. **Description**: (s. Beispiel unten)
 6. **Options**:
    - [ ] This is a pre-release (nur für Beta-Versionen)
@@ -70,15 +70,15 @@ Vor jedem Release:
 **Via Git CLI**:
 
 ```bash
-git tag 0.0.5
-git push origin 0.0.5
+git tag 0.1.0
+git push origin 0.1.0
 # Dann Release auf GitHub UI erstellen mit Notes
 ```
 
 ### 3. Release-Notes Vorlage
 
 ```markdown
-## 🎉 Release 0.0.5
+## 🎉 Release 0.1.0
 
 ### What's new?
 
@@ -126,39 +126,31 @@ Thanks to:
 - Plus weitere...
 ```
 
-## Release-Notes für aktuelle Version (0.0.4)
+## Release-Notes für aktuelle Version (0.1.0)
 
 ```markdown
-## 🎉 Release 0.0.4
+## 🎉 Release 0.1.0
 
 ### What's new?
 
 #### ✨ Features
-- **Entity-ID Vereinfachung**: Entity-IDs sind jetzt fahrzeugagnostisch (z.B. `switch.evcc_repeating_plan_1`)
-- **Entity Manager Optimierung**: Fahrzeugwechsel mit gleicher Plan-Anzahl = 0 Registry-Zugriffe
-- **Fahrzeug-Metadaten**: `vehicle_title` und `vehicle_id` in Switch-Attributen
+- Konfigurierbarer WebSocket- vs. Polling-Modus inkl. Poll-Intervall (Default: 30s)
+- WebSocket API für die Custom Lovelace Card (`scheduler/get|add|edit|deleate`)
+- Switch-Attribute enthalten Fahrzeug-Metadaten (`vehicle_title`, `vehicle_id`)
+- Entity-Lifecycle optimiert: `update_data()` aktualisiert Entities ohne Registry-Churn
 
 #### 🐛 Fixes
-- Entfernt: `toggle_plan_active` Service (redundant mit `active`-Feld in `set_repeating_plan`)
-- Entity-Sync Stabilität verbessert
-- WebSocket-Reconnect-Logik optimiert
+- Plan-Erstellung: `build_entity_id()` Signatur korrigiert, Pläne werden sauber angelegt
+- Plan-Toggle: Holt aktuelle EVCC-Pläne vor dem Schreiben (keine veralteten Arrays)
+- Entity-Namen vereinheitlicht (`evcc_repeating_plan_{index}`)
 
 #### 📚 Documentation
-- Vollständige deutsche und englische Dokumentation
-- HACS-Kompatibilität verifiziert
-- Integration-Architektur dokumentiert
-- Debugging-Guides hinzugefügt
+- Deutsche und englische Dokumentation aktualisiert
+- Release- und Architektur-Guides aufgefrischt
 
 #### ⚡ Performance
-- Entity Manager: Lazy-Load Registry (nur beim Löschen)
-- Switch Entity: Effiziente `update_data()` Methode
-- Coordinator: 30s Polling + WebSocket Real-Time
-
-### 🔄 Breaking Changes
-
-- Entity-ID Format geändert: Alte IDs könnten vom System neu erstellt werden
-  - **Lösung**: Nach Update kurz warten, dann sollten neue IDs erstellt werden
-  - **Automations**: Update Entity-ID-Referenzen (z.B. von `evcc_tesla_repeating_plan_1` → `evcc_repeating_plan_1`)
+- Entity Manager: Registry nur bei Löschungen geladen (lazy)
+- WebSocket-Updates dedupliziert, häufig ohne zusätzliche API-Calls
 
 ### 🔄 Dependencies
 
@@ -166,6 +158,10 @@ Thanks to:
 - EVCC: 0.210.2+
 - Python: 3.11+
 - aiohttp: 3.8.0+
+
+### 🔄 Breaking Changes
+
+- Keine. Entity-IDs bleiben stabil (`evcc_repeating_plan_{index}`).
 
 ### 📝 Installation
 
@@ -179,11 +175,10 @@ HACS → Integrationen → EVCC Scheduler
 ### 📋 Checkliste nach Update
 
 - [ ] Home Assistant neu gestartet
-- [ ] Neue Entity-IDs (`switch.evcc_repeating_plan_*`) vorhanden
-- [ ] Alte Entity-IDs aus Registry entfernt
-- [ ] Automations mit neuen Entity-IDs aktualisiert
-- [ ] Fahrzeugwechsel getestet
+- [ ] WebSocket-Updates werden empfangen (oder Polling-Fallback getestet)
+- [ ] Fahrzeugwechsel getestet (Entities bleiben stabil)
 - [ ] Services `set_repeating_plan` / `del_repeating_plan` funktionieren
+- [ ] Custom Card (falls genutzt) erhält `scheduler/*` Antworten
 
 ### 🙏 Credits
 
@@ -198,8 +193,8 @@ Keine bekannten Probleme in dieser Version.
 
 ### 🔮 Next Steps
 
-- Version 0.0.5: Home Assistant Brands Integration
-- Version 0.1.0: Stable Release & HACS Default Store
+- Version 0.1.1: Bugfixes & HACS Review Tasks
+- Version 0.2.0: Erweiterte Scheduling-Features / Templates
 ```
 
 ## Automatisierte Release-Prozesse (Optional)
@@ -277,7 +272,7 @@ fi
 - [ ] manifest.json version aktualisiert
 - [ ] Alle Code-Changes committed
 - [ ] Git Tag erstellt: `git tag X.X.X`
-- [ ] Git Push mit Tags: `git push origin main --tags`
+- [ ] Git Push mit Tags: `git push origin master --tags`
 - [ ] GitHub Release Draft erstellt
 - [ ] Release Notes aktualisiert
 - [ ] Veröffentlicht
@@ -286,4 +281,4 @@ fi
 ---
 
 **Letzte Aktualisierung**: Januar 2026  
-**Aktuelle Version**: 0.0.4
+**Aktuelle Version**: 0.1.0

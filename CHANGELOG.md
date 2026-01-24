@@ -5,7 +5,7 @@ All notable changes to the EVCC Scheduler Home Assistant Custom Integration will
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2026-01-23
+## [0.1.0] - 2026-01-24
 
 ### 🚀 Performance Improvements
 
@@ -259,7 +259,7 @@ websocket_api.py (Custom Card API)
 
 ---
 
-**Release Date**: January 21, 2026  
+**Release Date**: January 24, 2026  
 **Home Assistant Compatibility**: 2025.12.0+  
 **EVCC Compatibility**: 0.210.2+  
 **License**: MIT
