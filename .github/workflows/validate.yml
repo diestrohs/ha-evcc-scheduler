@@ -26,7 +26,6 @@ jobs:
 
       - name: Hassfest validation
         uses: home-assistant/actions/hassfest@master
-        uses: github/codeql-action/analyze@v2
 
   lint:
     runs-on: ubuntu-latest
