@@ -111,9 +111,8 @@ Nach der Installation und dem Neustart von Home Assistant:
    - **Port**: EVCC API Port (Default: `7070`)
    - **Token**: Optional, falls EVCC Token-Auth hat
    - **SSL**: An/Aus je nach EVCC-Setup
-   - **Timeout**: HTTP-Timeout in Sekunden (Default: `10`)
-   - **WebSocket-Modus**: An/Aus (Default: An - empfohlen)
-  - **Custom Card WebSocket API (experimentell/ungestet)**: Standardmäßig AUS; nur aktivieren, wenn die Custom Card WS-API benötigt wird
+   - **WebSocket**: An/Aus für Echtzeit-Updates (Default: An - empfohlen)
+   - **Aktualisierungsintervall**: Sekunden (Default: 30, nur wenn WebSocket AUS)
 
 #### 4. Optional: Logging aktivieren
 
@@ -321,16 +320,16 @@ data:
 4. websocket_client.py → coordinator.async_request_refresh()
    ↓
 5. _async_update_data() lädt db:2 statt db:1
-   ├─ wanted_ids = {evcc_eniaq_repeating_plan_01, evcc_eniaq_repeating_plan_02}
-   └─ current_ids = {evcc_elroq_repeating_plan_01, evcc_elroq_repeating_plan_02}
+   ├─ wanted_ids = {evcc_repeating_plan_1, evcc_repeating_plan_2}
+   └─ current_ids = {evcc_repeating_plan_1, evcc_repeating_plan_2}
    ↓
-6. entity_manager.sync()
-   ├─ Löscht evcc_elroq_repeating_plan_* aus entities dict
-   ├─ async_remove() aus Registry
-   ├─ Erstellt evcc_eniaq_repeating_plan_* neu
-   └─ async_add_entities() registriert neue Entities
+7. entity_manager.sync()
+   ├─ Laden aktualisierte Daten mit update_data()
+   ├─ Keine Registry-Zugriffe bei gleicher Plan-Anzahl
+   ├─ Entity-IDs bleiben stabil!
+   └─ Automations funktionieren weiter
    ↓
-✅ Eniaq-Pläne sichtbar, Elroq-Entities gelöscht
+✅ Pläne aktualisiert, Entity-IDs bleiben gleich (fahrzeugagnostisch)
 ```
 
 ### Service-Aufruf (set_repeating_plan)
@@ -388,7 +387,7 @@ data:
 
 | Kontext | Indexierung | Beispiel |
 |---------|-------------|----------|
-| Home Assistant Entity-Name | 1-basiert | `evcc_elroq_repeating_plan_01`, `_02`, `_03` |
+| Home Assistant Entity-Name | 1-basiert | `evcc_repeating_plan_1`, `evcc_repeating_plan_2`, `evcc_repeating_plan_3` |
 | Entity-ID in UI/Services | 1-basiert | Plan 1, Plan 2, Plan 3 |
 | EVCC JSON Array | 0-basiert | `plans[0]`, `plans[1]`, `plans[2]` |
 | Interner Code | 0-basiert für Arrays | `idx = plan_index - 1` |
@@ -647,5 +646,5 @@ MIT License - Siehe LICENSE Datei
 
 ---
 
-**Zuletzt aktualisiert**: 20. Januar 2026  
-**Version**: 0.0.4
+**Zuletzt aktualisiert**: 24. Januar 2026  
+**Version**: 0.0.5
