@@ -647,4 +647,4 @@ MIT License - Siehe LICENSE Datei
 ---
 
 **Zuletzt aktualisiert**: 24. Januar 2026  
-**Version**: 0.1.0
+**Version**: 0.1.1

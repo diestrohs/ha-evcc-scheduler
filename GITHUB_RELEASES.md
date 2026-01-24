@@ -15,7 +15,7 @@ MAJOR.MINOR.PATCH
 ### Aktuelle Version
 
 ```
-0.1.0
+0.1.1
 └─ First stable (0.x)
 ```
 
@@ -29,6 +29,7 @@ MAJOR.MINOR.PATCH
 | 0.0.4 | ✅ Veröffentlicht | Entity-ID Vereinfachung, Optimierungen |
 | 0.0.5 | ✅ Veröffentlicht | HACS Default Store, Home Assistant Brands |
 | 0.1.0 | ✅ Veröffentlicht | Stable Release, WS/Polling Konfiguration, WS API |
+| 0.1.1 | ✅ Veröffentlicht | Patch: Repo-Links/Codeowner auf diestrohs |
 
 ## Release-Prozess
 
@@ -47,7 +48,7 @@ Vor jedem Release:
 
 # manifest.json updaten
 {
-  "version": "0.1.0"
+  "version": "0.1.1"
 }
 
 # hacs.json hat keine Version (kommt aus manifest.json)
@@ -58,9 +59,9 @@ Vor jedem Release:
 **Via GitHub Web UI**:
 
 1. Repository → Releases → Draft a new release
-2. **Tag**: `0.1.0` (exakt mit manifest.json)
+2. **Tag**: `0.1.1` (exakt mit manifest.json)
 3. **Target**: `master` (default branch)
-4. **Title**: `Release 0.1.0`
+4. **Title**: `Release 0.1.1`
 5. **Description**: (s. Beispiel unten)
 6. **Options**:
    - [ ] This is a pre-release (nur für Beta-Versionen)
@@ -70,15 +71,15 @@ Vor jedem Release:
 **Via Git CLI**:
 
 ```bash
-git tag 0.1.0
-git push origin 0.1.0
+git tag 0.1.1
+git push origin 0.1.1
 # Dann Release auf GitHub UI erstellen mit Notes
 ```
 
 ### 3. Release-Notes Vorlage
 
 ```markdown
-## 🎉 Release 0.1.0
+## 🎉 Release 0.1.1
 
 ### What's new?
 
@@ -126,31 +127,17 @@ Thanks to:
 - Plus weitere...
 ```
 
-## Release-Notes für aktuelle Version (0.1.0)
+## Release-Notes für aktuelle Version (0.1.1)
 
 ```markdown
-## 🎉 Release 0.1.0
+## 🎉 Release 0.1.1
 
 ### What's new?
 
-#### ✨ Features
-- Konfigurierbarer WebSocket- vs. Polling-Modus inkl. Poll-Intervall (Default: 30s)
-- WebSocket API für die Custom Lovelace Card (`scheduler/get|add|edit|deleate`)
-- Switch-Attribute enthalten Fahrzeug-Metadaten (`vehicle_title`, `vehicle_id`)
-- Entity-Lifecycle optimiert: `update_data()` aktualisiert Entities ohne Registry-Churn
-
-#### 🐛 Fixes
-- Plan-Erstellung: `build_entity_id()` Signatur korrigiert, Pläne werden sauber angelegt
-- Plan-Toggle: Holt aktuelle EVCC-Pläne vor dem Schreiben (keine veralteten Arrays)
-- Entity-Namen vereinheitlicht (`evcc_repeating_plan_{index}`)
-
-#### 📚 Documentation
-- Deutsche und englische Dokumentation aktualisiert
-- Release- und Architektur-Guides aufgefrischt
-
-#### ⚡ Performance
-- Entity Manager: Registry nur bei Löschungen geladen (lazy)
-- WebSocket-Updates dedupliziert, häufig ohne zusätzliche API-Calls
+#### 🛠️ Maintenance
+- Repo-Links und Issue-Tracker auf `diestrohs/ha-evcc-scheduler` korrigiert
+- Codeowner im manifest aktualisiert
+- Patch-Bump auf 0.1.1 (keine funktionalen Änderungen)
 
 ### 🔄 Dependencies
 
@@ -281,4 +268,4 @@ fi
 ---
 
 **Letzte Aktualisierung**: Januar 2026  
-**Aktuelle Version**: 0.1.0
+**Aktuelle Version**: 0.1.1
