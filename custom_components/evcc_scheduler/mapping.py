@@ -27,5 +27,12 @@ def extract_plans(state: Dict) -> Dict:
     return {"vehicles": vehicles, "id_map": id_to_title}
 
 
-def build_entity_id(vehicle_id: str, index: int) -> str:
-    return f"evcc_repeating_plan_{index}"
+def build_entity_id(vehicle_id: str, index: int, title: str = None) -> str:
+    base = title if title else vehicle_id
+    safe_name = (
+        base.lower()
+        .replace(":", "_")
+        .replace("-", "_")
+        .replace(" ", "_")
+    )
+    return f"evcc_{safe_name}_repeating_plan_{index}_activ"

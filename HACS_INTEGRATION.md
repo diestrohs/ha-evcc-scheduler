@@ -21,7 +21,7 @@ Diese Integration ist vollständig HACS-kompatibel und erfüllt alle Anforderung
 {
   "domain": "evcc_scheduler",
   "name": "EVCC Scheduler",
-  "version": "0.0.4",
+  "version": "0.1.2",
   "documentation": "https://github.com/yourusername/evcc_scheduler",
   "issue_tracker": "https://github.com/yourusername/evcc_scheduler/issues",
   "codeowners": ["@yourusername"],
@@ -77,7 +77,7 @@ Wenn Sie diese Integration zum HACS Default Repository hinzufügen möchten:
 - [ ] **Description**: Im GitHub-Repository gesetzt (2-3 Sätze)
 - [ ] **Topics**: GitHub Topics hinzugefügt: `homeassistant`, `integration`, `evcc`, `ev-charging`
 - [ ] **Releases**: GitHub Releases veröffentlicht (Tags reichen nicht!)
-  - [ ] Semantische Versionierung (z.B. `0.0.4`)
+  - [ ] Semantische Versionierung (z.B. `0.1.2`)
   - [ ] Release Notes mit Changelog
   - [ ] ≥5 Releases empfohlen für HACS-Store-Präsenz
 - [ ] **Home Assistant Brands**: Integration in [home-assistant/brands](https://github.com/home-assistant/brands) registriert (optional, aber empfohlen für UI-Konsistenz)
@@ -114,23 +114,21 @@ Für HACS ist das Veröffentlichen von Releases nicht zwingend erforderlich, wir
 ### Release erstellen
 
 1. GitHub → Releases → Create a new release
-2. Tag: `0.0.4` (muss mit `version` in manifest.json übereinstimmen)
-3. Title: `Release 0.0.4`
+2. Tag: `0.1.2` (muss mit `version` in manifest.json übereinstimmen)
+3. Title: `Release 0.1.2`
 4. Description: 
    ```markdown
-   ## What's new in 0.0.4
+  ## What's new in 0.1.2
 
-   ### Features
-   - Entity-ID simplified to be vehicle-agnostic
-   - Entity manager optimized for minimal registry access
-   - Vehicle metadata added to switch attributes
-
-   ### Fixes
-   - Toggle service removed (use `active` field in set_repeating_plan)
+   ### Maintenance
+   - Repository links corrected to diestrohs/ha-evcc-scheduler
+   - Documentation updated to match code state
+   - Weekdays format clarified (1=Monday through 7=Sunday)
 
    ### Documentation
-   - Comprehensive German & English documentation
-   - HACS compatibility verified
+   - All documentation files synchronized
+  - Version references updated to 0.1.2
+   - services.yaml weekdays description corrected
    ```
 5. Publish release
 
@@ -154,8 +152,8 @@ Mit Releases erhält der HACS-Nutzer eine schöne Auswahl der letzten 5 Releases
 - Korrekte Feldnamen: `name`, `homeassistant`, `issue_tracker` (nicht `issuetracker`!)
 
 ### "Version stimmt nicht überein"
-- manifest.json `version`: `0.0.4`
-- GitHub Release Tag: `0.0.4` (exakt gleich)
+- manifest.json `version`: `0.1.2`
+- GitHub Release Tag: `0.1.2` (exakt gleich)
 - hacs.json: Keine Version nötig (kommt aus manifest.json)
 
 ## Weitere Ressourcen
@@ -173,4 +171,4 @@ Mit Releases erhält der HACS-Nutzer eine schöne Auswahl der letzten 5 Releases
 ---
 
 **Status**: ✅ HACS-kompatibel (Custom Repository ready)  
-**Aktualisiert**: Januar 2026
+**Aktualisiert**: 24. Januar 2026

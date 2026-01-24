@@ -97,5 +97,5 @@ pip install --upgrade aiohttp
 
 ---
 
-**Last Updated**: January 2026  
+**Last Updated**: January 24, 2026  
 **Status**: No active security issues

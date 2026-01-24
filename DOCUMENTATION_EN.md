@@ -60,10 +60,13 @@ Settings → Devices and Services → + Create Integration
 
 ```
 config_flow.py ──→ __init__.py ──→ coordinator.py ──→ api.py
-    ↓                  ↓
+  ↓                  ↓
 websocket_client.py    entity_manager.py ←→ switch.py
-    ↓
-websocket_api.py (Custom Card API)
+  ↓                               ↓         time.py
+websocket_api.py                    ↓         text.py
+                  ↓         number.py
+                  ↓
+                 base_entity.py (shared)
 ```
 
 ---
@@ -148,28 +151,48 @@ After installation and Home Assistant restart:
 
 ---
 
-## Usage
+## Entities
 
-### Available Entities
+The integration creates four entity types per repeating plan to edit all properties individually.
 
-#### Switch Platform
+### Entity Platforms
 
-For each repeating plan, a switch entity is created:
-- **Entity ID Format**: `switch.evcc_repeating_plan_{index}` (vehicle-agnostic, stable)
-- **Example**: `switch.evcc_repeating_plan_1`, `switch.evcc_repeating_plan_2`
-- **Benefit**: Entity IDs remain constant across vehicle changes; automations are vehicle-switch-resistant
+#### 1) Switch — Plan Active/Inactive
+- **Entity ID**: `switch.evcc_{vehicle}_repeating_plan_{index}_activ`
+- **Example**: `switch.evcc_elroq_repeating_plan_1_activ`
+- **Icon**: default (system switch)
+- **Attributes (full plan)**: `time`, `weekdays`, `soc`, `active` + `vehicle_id`, `vehicle_title`, `plan_index`
+- **Behavior**: Loads all plans, modifies only `active`, pushes full array back, then refreshes coordinator
 
-#### Switch Attributes
+#### 2) Time — Plan Start Time
+- **Entity ID**: `time.evcc_{vehicle}_repeating_plan_{index}_time`
+- **Example**: `time.evcc_elroq_repeating_plan_1_time`
+- **Icon**: `mdi:clock-digital`
+- **Format**: `HH:MM` (24-hour)
+- **Attributes (minimal)**: `vehicle_id`, `vehicle_title`, `plan_index`
 
-```yaml
-name: "Plan 1"              # User-friendly name
-active: true                # Plan is active (toggleable)
-time: "07:00"              # Start time
-weekdays: [1,2,3,4,5]      # Days of week (1=Monday, 7=Sunday)
-soc: 80                     # Target state of charge (%)
-vehicle_title: "Tesla"      # Current vehicle name
-vehicle_id: "vehicle:0"     # Current vehicle ID (to verify data is current)
-```
+#### 3) Text — Plan Weekdays
+- **Entity ID**: `text.evcc_{vehicle}_repeating_plan_{index}_weekdays`
+- **Example**: `text.evcc_elroq_repeating_plan_1_weekdays`
+- **Format**: comma-separated string, e.g. `"1,2,3,4,5"` (1=Mon ... 7=Sun)
+- **Attributes (minimal + list)**: `vehicle_id`, `vehicle_title`, `plan_index`, `weekdays_list`
+
+#### 4) Number — Plan Target SOC
+- **Entity ID**: `number.evcc_{vehicle}_repeating_plan_{index}_soc`
+- **Example**: `number.evcc_elroq_repeating_plan_1_soc`
+- **Icon**: `mdi:battery-charging`
+- **Range**: 0–100 (%). UI slider uses step `10`; services can set any integer 0–100.
+- **Attributes (minimal)**: `vehicle_id`, `vehicle_title`, `plan_index`
+
+### Entity ID Generation
+- Base ID: `evcc_{vehicle}_repeating_plan_{index}_activ`
+- Suffix per platform: `_activ` → `_time` / `_weekdays` / `_soc`
+- Vehicle ID sanitization: `lower()` and replace `:`, `-`, spaces with `_`
+
+### Indexing: 1-based UI, 0-based arrays
+- UI entities use 1-based indexing: plan 1, 2, 3
+- EVCC plan arrays are 0-based: `plans[index - 1]`
+- No leading zeros: `..._1_activ`, not `..._01_activ`
 
 ### Available Services
 
@@ -202,9 +225,11 @@ data:
 |-----------|------|---------|-------------|
 | `plan_index` | integer | - | Plan number to create/update (1-based). Omit to create new plan |
 | `time` | string | - | Time in HH:MM format (24h) |
-| `weekdays` | array | - | Days: [1=Mon, 2=Tue, ..., 7=Sun] |
+| `weekdays` | array | - | Days: [1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat, 7=Sun] |
 | `soc` | integer | - | Target SOC: 1-100 (%) |
 | `active` | boolean | `true` | Plan is active |
+
+Note: The UI number slider uses step `10`, but services can set any integer between 0 and 100.
 
 **Toggle Plan Active:**
 
@@ -327,10 +352,14 @@ custom_components/evcc_scheduler/
 ├── const.py                    # Constants (domain, ports, etc.)
 ├── coordinator.py              # DataUpdateCoordinator
 ├── entity_manager.py           # Dynamic entity lifecycle
+├── base_entity.py              # Shared base entity for plan entities
 ├── mapping.py                  # Data extraction & mapping
 ├── services.py                 # Service registration
 ├── services.yaml               # Service definitions
 ├── switch.py                   # Switch platform
+├── time.py                     # Time platform
+├── text.py                     # Text platform
+├── number.py                   # Number platform
 ├── websocket_api.py            # Custom Card API
 ├── websocket_client.py         # WebSocket connection
 ├── manifest.json               # Integration manifest
@@ -403,6 +432,6 @@ MIT License - See [LICENSE](./LICENSE) for details.
 
 ---
 
-**Last Updated**: January 21, 2026  
-**Version**: 0.0.4  
+**Last Updated**: January 24, 2026  
+**Version**: 0.1.2  
 **Maintainer**: [@diestrohs](https://github.com/diestrohs)

@@ -21,8 +21,8 @@ set_repeating_plan:
       selector:
         text:
     weekdays:
-      description: List of weekdays (0=Monday, 6=Sunday).
-      example: [0, 1, 2, 3, 4]
+      description: List of weekdays (1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday).
+      example: [1, 2, 3, 4, 5]
       required: false
       selector:
         object:

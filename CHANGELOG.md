@@ -1,3 +1,44 @@
+## [0.1.2] - 2026-01-24
+
+**Highlights**: BaseEvccPlanEntity, vereinheitlichtes Plattform-Setup, Service-Optimierung (weniger API-Calls), Icons (Time/Number), SOC-Slider Schrittweite 10
+
+### ✨ Verbesserungen
+
+- Gemeinsame Basisklasse `BaseEvccPlanEntity` eingeführt (zentralisiert gemeinsame Felder, `update_data()`, ID-Helfer)
+- Plattform-Setup vereinheitlicht via `setup_platform()` (reduziert Boilerplate in `switch.py`, `time.py`, `text.py`, `number.py`)
+- Vereinheitlichte `extra_state_attributes` über alle Entities
+  - Basis: `vehicle_id`, `vehicle_title`, `plan_index`
+  - Switch erweitert um vollständige Plan-Felder (`time`, `weekdays`, `soc`, `active`)
+  - Text erweitert um `weekdays_list`
+- Icons ergänzt:
+  - Time: `mdi:clock-digital`
+  - Number (SOC): `mdi:battery-charging`
+- UI: SOC-Slider Schrittweite auf 10 gesetzt (Services akzeptieren weiterhin jeden Integer 0–100)
+
+### 🛠️ Service-Optimierungen
+
+- Redundante API-Calls entfernt: Services nutzen den bereits geladenen EVCC-State und vermeiden einen zusätzlichen `get_repeating_plans()` Aufruf
+- Fahrzeug-Validierung und State-Abruf in Hilfsfunktionen ausgelagert (`_get_vehicles()`, `_ensure_vehicle_exists()`)
+
+### 📚 Dokumentation
+
+- EN/DE Dokumentationen aktualisiert:
+  - Vollständiger Entities-Abschnitt (4 Plattformen, Icons, Minimal-/Voll-Attribute)
+  - Architekturdiagramme inkl. `base_entity.py`, `time.py`, `text.py`, `number.py`
+  - Hinweis zur SOC-Schrittweite (UI vs. Services)
+- README_DE/README_EN angepasst (Icons & SOC-Hinweis)
+
+### 🏷️ Versionierung & Release
+
+- manifest.json Version auf 0.1.2 angehoben
+- GitHub Releases Guide um 0.1.2 Roadmap-Zeile ergänzt, Footer-Datum präzisiert
+- READMEs mit "Last Updated"/"Zuletzt aktualisiert" auf 24. Januar 2026 gesetzt
+
+### 🔒 Verhalten
+
+- Keine funktionalen Änderungen am Datenfluss: Pull-Modify-Push-Refresh bleibt bestehen
+- WebSocket/Coordinator-Mechanik unverändert, nur effizienter Service-Pfad
+
 # Changelog
 
 All notable changes to the EVCC Scheduler Home Assistant Custom Integration will be documented in this file.
@@ -11,6 +52,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository-Links auf `diestrohs/ha-evcc-scheduler` korrigiert (manifest.json, hacs.json)
 - Patch-Release-Version auf 0.1.1 angehoben (keine funktionalen Änderungen)
+
+### 📝 Documentation
+
+- Alle Dokumentationsdateien auf aktuellen Code-Stand gebracht
+- Weekdays-Format in services.yaml korrigiert (1-7 statt 0-6)
+- Versionsangaben auf 0.1.1 aktualisiert in:
+  - README.md und README_DE.md
+  - DOCUMENTATION.md und DOCUMENTATION_DE.md
+  - manifest.json Referenzen
+- Vollständige Beschreibung der Weekdays: 1=Mo, 2=Di, 3=Mi, 4=Do, 5=Fr, 6=Sa, 7=So
 
 ## [0.1.0] - 2026-01-24
 

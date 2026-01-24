@@ -24,46 +24,27 @@ class EvccCoordinator(DataUpdateCoordinator):
         _LOGGER.debug("Fetching EVCC state and plans")
         state = await self.api.get_state()
         
-        # Hole vehicleName aus den Loadpoints
-        active_vehicle_id = None
-        loadpoints = state.get("loadpoints", [])
-        
-        for loadpoint in loadpoints:
-            vehicle_name = loadpoint.get("vehicleName", "")
-            # Wenn vehicleName gesetzt ist (nicht leer), verwende dieses Fahrzeug
-            if vehicle_name:
-                active_vehicle_id = vehicle_name
-                _LOGGER.info("Active vehicle: %s", active_vehicle_id)
-                break
-        
-        # Lade nur Pläne für das aktive Fahrzeug
+        # Lade Pläne für ALLE Fahrzeuge
         vehicles_data = {}
         all_vehicles = state.get("vehicles", {})
         
-        if active_vehicle_id and active_vehicle_id in all_vehicles:
-            # Nur das aktive Fahrzeug laden
-            vehicle = all_vehicles[active_vehicle_id]
-            title = vehicle.get("title", active_vehicle_id)
-            plans = vehicle.get("repeatingPlans", [])
+        for vehicle_id, vehicle_data in all_vehicles.items():
+            if not isinstance(vehicle_data, dict):
+                continue
+                
+            title = vehicle_data.get("title", vehicle_id)
+            plans = vehicle_data.get("repeatingPlans", [])
             
-            vehicles_data[active_vehicle_id] = {
+            vehicles_data[vehicle_id] = {
                 "title": title,
                 "repeatingPlans": plans if isinstance(plans, list) else []
             }
             
-            # Data-Consistency-Log: Bestätige aktuellen State
-            _LOGGER.debug(
-                "Data consistency check: Vehicle %s (%s) has %d plans",
-                active_vehicle_id, title, len(plans)
-            )
-            self.id_map = {active_vehicle_id: title}
-            _LOGGER.debug("Loaded %d plans for active vehicle: %s (%s)", len(plans), title, active_vehicle_id)
-        else:
-            # Kein Fahrzeug ausgewählt oder nicht gefunden
+            self.id_map[vehicle_id] = title
+            _LOGGER.debug("Loaded %d plans for vehicle: %s (%s)", len(plans), title, vehicle_id)
+        
+        if not vehicles_data:
+            _LOGGER.info("No vehicles found in EVCC")
             self.id_map = {}
-            if not active_vehicle_id:
-                _LOGGER.info("No vehicle selected in EVCC (vehicleName is empty)")
-            else:
-                _LOGGER.warning("Vehicle %s not found in EVCC vehicles data", active_vehicle_id)
         
         return {"vehicles": vehicles_data, "id_map": self.id_map}

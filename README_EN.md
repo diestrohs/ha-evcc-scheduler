@@ -174,10 +174,12 @@ See [CHANGELOG.md](./CHANGELOG.md) for version history.
 
 ---
 
-**Version**: 0.0.4  
+**Version**: 0.1.2  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **License**: MIT
+
+**Last Updated**: January 24, 2026
 
 [Deutsch / German](./README_DE.md)
 cd /config/custom_components
@@ -242,14 +244,29 @@ data:
 
 ### Entities
 
-Pro Ladeplan wird eine Switch-Entity erstellt:
-- `switch.evcc_[fahrzeug]_repeating_plan_[nr]`
+Per charging plan, 4 entities are created:
 
-Die Entity zeigt den Status des Plans und weitere Attribute:
-- `time`: Startzeit des Plans
-- `weekdays`: Wochentage
-- `soc`: Ladeziel in %
-- `active`: Status
+- **Switch**: `switch.evcc_elroq_repeating_plan_1_activ` - Activate/deactivate plan
+- **Time**: `time.evcc_elroq_repeating_plan_1_time` - Start time of the plan
+-   Icon: `mdi:clock-digital`
+- **Text**: `text.evcc_elroq_repeating_plan_1_weekdays` - Weekdays (comma-separated: 1,2,3,4,5)
+- **Number**: `number.evcc_elroq_repeating_plan_1_soc` - Target charge in % (0-100)
+-   Icon: `mdi:battery-charging` (UI slider step: 10; services accept any integer 0–100)
+
+**Entity Attributes** (available in all entities):
+- `vehicle_id`: Vehicle ID (e.g. `db:1`)
+- `vehicle_title`: Vehicle name (e.g. `Elroq`)
+- `plan_index`: Plan number (1-based)
+- `time`, `weekdays`, `soc`, `active`: Plan details (only in Switch entity)
+- `weekdays_list`: Weekdays as list (only in Text entity)
+
+**Note**: Entity IDs remain stable across vehicle changes - automations continue working!
+
+### Architecture Notes
+
+- Entities share a common base: `base_entity.py` (`BaseEvccPlanEntity`)
+- Provides shared fields (`vehicle_id`, `vehicle_title`, `plan_index`), `update_data()`, and unique ID helper
+- Platform setup is unified via `setup_platform()` to reduce boilerplate
 
 ## Dokumentation
 

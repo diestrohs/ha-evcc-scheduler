@@ -16,4 +16,4 @@ DEFAULT_WEBSOCKET = True
 DEFAULT_WS_API = False
 DEFAULT_POLL_INTERVAL = 30
 
-PLATFORMS = ["switch"]
+PLATFORMS = ["switch", "time", "text", "number"]

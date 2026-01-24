@@ -89,7 +89,7 @@ Create or update a repeating charging plan.
 - `vehicle_id` (required): Vehicle ID from EVCC (e.g., `db:1`)
 - `plan_index` (optional): Plan number (1-based). Omit to create new plan
 - `time` (optional): Start time in HH:MM format (24h)
-- `weekdays` (optional): Weekdays [1=Mon, 2=Tue, ..., 7=Sun]
+- `weekdays` (optional): Weekdays [1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat, 7=Sun]
 - `soc` (optional): Target state of charge (1-100%)
 - `active` (optional): Plan is active (true/false, default: true)
 
@@ -192,10 +192,12 @@ See [CHANGELOG.md](./CHANGELOG.md) for version history.
 
 ---
 
-**Version**: 0.0.4  
+**Version**: 0.1.2  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **License**: MIT
+
+**Last Updated**: January 24, 2026
 
 [Deutsch / German](./README_DE.md)
 cd /config/custom_components
@@ -260,14 +262,21 @@ data:
 
 ### Entities
 
-Pro Ladeplan wird eine Switch-Entity erstellt:
-- `switch.evcc_[fahrzeug]_repeating_plan_[nr]`
+Pro Ladeplan werden 4 Entities erstellt:
 
-Die Entity zeigt den Status des Plans und weitere Attribute:
-- `time`: Startzeit des Plans
-- `weekdays`: Wochentage
-- `soc`: Ladeziel in %
-- `active`: Status
+- **Switch**: `switch.evcc_elroq_repeating_plan_1_activ` - Plan aktivieren/deaktivieren
+- **Time**: `time.evcc_elroq_repeating_plan_1_time` - Startzeit des Plans
+- **Text**: `text.evcc_elroq_repeating_plan_1_weekdays` - Wochentage (kommagetrennt: 1,2,3,4,5)
+- **Number**: `number.evcc_elroq_repeating_plan_1_soc` - Ladeziel in % (0-100)
+
+**Entity-Attribute** (in allen Entities verfügbar):
+- `vehicle_id`: Fahrzeug-ID (z.B. `db:1`)
+- `vehicle_title`: Fahrzeugname (z.B. `Elroq`)
+- `plan_index`: Plan-Nummer (1-basiert)
+- `time`, `weekdays`, `soc`, `active`: Plan-Details (nur in Switch-Entity)
+- `weekdays_list`: Wochentage als Liste (nur in Text-Entity)
+
+**Hinweis**: Entity-IDs bleiben stabil bei Fahrzeugwechsel - Automationen funktionieren weiter!
 
 ## Dokumentation
 

@@ -44,11 +44,30 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
 
 ### Verwendung
 
-- Switch-Entities erscheinen als `switch.evcc_repeating_plan_01`, `switch.evcc_repeating_plan_02`, etc. (fahrzeugagnostisch)
-- Schalte Pläne direkt in der Home Assistant UI
-- Plan-Attribute enthalten `vehicle_title` und `vehicle_id` zur Verifizierung des aktuellen Fahrzeugs
-- Nutze Services zum Erstellen/Aktualisieren/Löschen von Plänen (Umschalten via `set_repeating_plan` + `active`-Feld)
-- Entity-IDs bleiben über Fahrzeugwechsel stabil - Automations brechen nicht!
+Pro Ladeplan werden vier Entities erstellt:
+
+- **Switch**: `switch.evcc_{fahrzeug}_repeating_plan_{index}_activ` – Plan aktiv/inaktiv
+  - Beispiel: `switch.evcc_elroq_repeating_plan_1_activ`
+- **Time**: `time.evcc_{fahrzeug}_repeating_plan_{index}_time` – Startzeit `HH:MM`
+  - Icon: `mdi:clock-digital`
+- **Text**: `text.evcc_{fahrzeug}_repeating_plan_{index}_weekdays` – Wochentage (Komma-separiert: `1,2,3,4,5`)
+- **Number**: `number.evcc_{fahrzeug}_repeating_plan_{index}_soc` – Zielladung in % (0–100)
+  - Icon: `mdi:battery-charging` (UI-Slider Schrittweite 10; Services akzeptieren jeden Integer 0–100)
+
+Attribute:
+- Alle Entities: `vehicle_id`, `vehicle_title`, `plan_index`
+- Switch zusätzlich: `time`, `weekdays`, `soc`, `active`
+- Text zusätzlich: `weekdays_list`
+
+Hinweise:
+- Entity-IDs enthalten das Fahrzeug (z. B. `elroq`) und sind 1-basiert ohne führende Nullen
+- Umschalten des Status erfolgt über den Switch oder per Service (`active`-Feld)
+
+### Architektur-Hinweise
+
+- Gemeinsame Basisklasse: `base_entity.py` (`BaseEvccPlanEntity`)
+  - Stellt gemeinsame Felder bereit (`vehicle_id`, `vehicle_title`, `plan_index`), `update_data()` und ID-Helfer
+- Vereinheitlichtes Plattform-Setup via `setup_platform()` (weniger Boilerplate, identisches Verhalten)
 
 ## Dokumentation
 
@@ -75,7 +94,7 @@ Erstelle oder aktualisiere einen wiederkehrenden Ladeplan.
 - `vehicle_id` (erforderlich): Fahrzeug-ID von EVCC (z.B. `db:1`)
 - `plan_index` (optional): Plan-Nummer (1-basiert). Weglassen = neuer Plan
 - `time` (optional): Startzeit im Format HH:MM (24h)
-- `weekdays` (optional): Wochentage [1=Mo, 2=Di, ..., 7=So]
+- `weekdays` (optional): Wochentage [1=Mo, 2=Di, 3=Mi, 4=Do, 5=Fr, 6=Sa, 7=So]
 - `soc` (optional): Ladeziel (1-100%)
 - `active` (optional): Plan ist aktiv (true/false, Standard: true)
 
@@ -178,9 +197,11 @@ Siehe [CHANGELOG.md](./CHANGELOG.md) für Versionsverlauf.
 
 ---
 
-**Version**: 0.0.4  
+**Version**: 0.1.2  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **Lizenz**: MIT
+
+**Zuletzt aktualisiert**: 24. Januar 2026
 
 [English](./README.md)

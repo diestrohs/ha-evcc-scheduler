@@ -39,6 +39,28 @@
       }
     }
   },
+  "entity": {
+    "switch": {
+      "repeating_plan_activ": {
+        "name": "{vehicle_title} repeating plan {index} activ"
+      }
+    },
+    "time": {
+      "repeating_plan_time": {
+        "name": "{vehicle_title} repeating plan {index} time"
+      }
+    },
+    "text": {
+      "repeating_plan_weekdays": {
+        "name": "{vehicle_title} repeating plan {index} weekdays"
+      }
+    },
+    "number": {
+      "repeating_plan_soc": {
+        "name": "{vehicle_title} repeating plan {index} target charge"
+      }
+    }
+  },
   "services": {
     "set_repeating_plan": {
       "name": "Set Repeating Plan",
@@ -58,7 +80,7 @@
         },
         "weekdays": {
           "name": "Weekdays",
-          "description": "List of weekdays (0=Monday, 6=Sunday)"
+          "description": "List of weekdays (1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday)"
         },
         "soc": {
           "name": "State of Charge",
@@ -88,7 +110,7 @@
   "entity": {
     "switch": {
       "weekly_plan": {
-        "name": "Plan {index}"
+        "name": "EVCC repeating plan {index}"
       }
     }
   }

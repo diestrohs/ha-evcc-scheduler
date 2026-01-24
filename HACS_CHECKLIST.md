@@ -40,7 +40,7 @@ Repository Root/
 ### 2. manifest.json
 - [x] `domain` Feld vorhanden
 - [x] `name` Feld vorhanden
-- [x] `version` Feld vorhanden (0.0.4)
+- [x] `version` Feld vorhanden (0.1.2)
 - [x] `documentation` URL vorhanden
 - [x] `issue_tracker` URL vorhanden (korrekt benannt, nicht `issuetracker`)
 - [x] `codeowners` Array vorhanden
@@ -52,10 +52,10 @@ Repository Root/
 {
   "domain": "evcc_scheduler",
   "name": "EVCC Scheduler",
-  "version": "0.0.4",
-  "documentation": "https://github.com/yourusername/evcc_scheduler",
-  "issue_tracker": "https://github.com/yourusername/evcc_scheduler/issues",
-  "codeowners": ["@yourusername"],
+  "version": "0.1.2",
+  "documentation": "https://github.com/diestrohs/ha-evcc-scheduler",
+  "issue_tracker": "https://github.com/diestrohs/ha-evcc-scheduler/issues",
+  "codeowners": ["@diestrohs"],
   "homeassistant": "2025.12.0",
   "iot_class": "local_polling",
   "config_flow": true,
@@ -122,17 +122,18 @@ Repository Root/
 ## ℹ️ Optionale Anforderungen (empfohlen)
 
 ### GitHub Releases
-- [ ] **Status**: Nicht (noch) veröffentlicht
-- [ ] **Nächster Schritt**: Releases für 0.0.1 - 0.0.4 erstellen
-- [ ] **Empfehlung**: Für HACS-Store-Sichtbarkeit erstellen
+- [x] **Status**: Veröffentlicht (0.0.1 - 0.1.2)
+- [x] **Empfehlung**: Für HACS-Store-Sichtbarkeit erstellt
 
-**Was zu tun ist**:
+**Verfügbare Releases**:
 ```
-GitHub → Releases → Create releases für:
+GitHub → Releases:
   - 0.0.1 (Initial)
   - 0.0.2 (Features)
   - 0.0.3 (Services)
   - 0.0.4 (Optimierungen)
+  - 0.1.0 (Stable)
+  - 0.1.2 (Patch - aktuell)
 ```
 
 ### Home Assistant Brands
@@ -198,9 +199,9 @@ Wenn Sie später ins HACS Default Store möchten:
 **Nächster Schritt**: Benutzer können hinzufügen via Custom Repository URL
 
 ### Phase 2: Releases & Stabilität
-- [ ] GitHub Releases für 0.0.1 - 0.0.4 erstellen
-- [ ] Mindestens 5 Releases für HACS-Sichtbarkeit
-- [ ] Stable Release (1.0.0 oder 0.1.0) planen
+- [x] GitHub Releases für 0.0.1 - 0.1.2 erstellt
+- [x] Mehrere Releases für HACS-Sichtbarkeit verfügbar
+- [x] Stable Release (0.1.2) vorhanden
 - [ ] Test-Feedback von Benutzern einholen
 
 **Wann**: Nach ein paar Wochen Betrieb mit Custom Repository
@@ -247,10 +248,10 @@ Wenn Sie später ins HACS Default Store möchten:
 {
   "domain": "evcc_scheduler",
   "name": "EVCC Scheduler",
-  "version": "0.0.4",
-  "documentation": "https://...",
-  "issue_tracker": "https://...",  // ← issue_tracker
-  "codeowners": ["@yourusername"],
+  "version": "0.1.2",
+  "documentation": "https://github.com/diestrohs/ha-evcc-scheduler",
+  "issue_tracker": "https://github.com/diestrohs/ha-evcc-scheduler/issues",
+  "codeowners": ["@diestrohs"],
   "homeassistant": "2025.12.0",
   "iot_class": "local_polling",
   "config_flow": true,
@@ -279,8 +280,8 @@ Wenn Sie später ins HACS Default Store möchten:
 
 **Lösung**:
 ```
-manifest.json: "version": "0.0.4"
-GitHub Tag:    "0.0.4"  ← exakt gleich!
+manifest.json: "version": "0.1.2"
+GitHub Tag:    "0.1.2"  ← exakt gleich!
 ```
 
 ---
@@ -315,5 +316,5 @@ GitHub Tag:    "0.0.4"  ← exakt gleich!
 ---
 
 **Status**: ✅ HACS-kompatibel (Custom Repository Ready)  
-**Aktualisiert**: Januar 2026  
-**Version**: 0.0.4
+**Aktualisiert**: 24. Januar 2026  
+**Version**: 0.1.2

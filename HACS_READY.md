@@ -271,4 +271,4 @@ git push origin main --tags
 
 ---
 
-**Dokumentation aktualisiert**: 21. Januar 2026
+**Dokumentation aktualisiert**: 24. Januar 2026

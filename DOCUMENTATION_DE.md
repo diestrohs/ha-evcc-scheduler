@@ -128,6 +128,124 @@ logger:
 
 ---
 
+## Entities
+
+Die Integration erstellt für jeden Ladeplan **vier verschiedene Entity-Typen**, um alle Plan-Eigenschaften einzeln bearbeitbar zu machen:
+
+### Entity-Plattformen
+
+#### 1. Switch - Ladeplan Aktiv/Inaktiv
+
+Schaltet den Plan ein/aus.
+
+**Entity-ID**: `switch.evcc_{fahrzeug}_repeating_plan_{index}_activ`
+
+**Beispiel**: `switch.evcc_elroq_repeating_plan_1_activ`
+
+**Funktionsweise**:
+- ON: Plan wird ausgeführt
+- OFF: Plan ist deaktiviert
+- Toggle lädt alle Pläne, ändert nur `active`, speichert zurück
+
+**Attribute**:
+```yaml
+vehicle_id: "db:1"
+vehicle_title: "Elroq"
+plan_index: 1
+time: "07:00"
+weekdays: [1, 2, 3, 4, 5]
+soc: 80
+active: true
+```
+
+#### 2. Time - Ladeplan Startzeit
+
+Bearbeitet die Startzeit des Plans.
+
+**Entity-ID**: `time.evcc_{fahrzeug}_repeating_plan_{index}_time`
+
+**Beispiel**: `time.evcc_elroq_repeating_plan_1_time`
+
+**Format**: HH:MM (24-Stunden)
+ 
+ **Icon**: `mdi:clock-digital`
+
+**Attribute**:
+```yaml
+vehicle_id: "db:1"
+vehicle_title: "Elroq"
+plan_index: 1
+```
+
+#### 3. Text - Ladeplan Wochentage
+
+Bearbeitet die Wochentage als komma-getrennte Liste.
+
+**Entity-ID**: `text.evcc_{fahrzeug}_repeating_plan_{index}_weekdays`
+
+**Beispiel**: `text.evcc_elroq_repeating_plan_1_weekdays`
+
+**Format**: `"1,2,3,4,5"` (1=Montag, 7=Sonntag)
+
+**Attribute**:
+```yaml
+vehicle_id: "db:1"
+vehicle_title: "Elroq"
+plan_index: 1
+weekdays_list: [1, 2, 3, 4, 5]  # Array-Format für Automations
+```
+
+#### 4. Number - Ladeplan Zielladung
+
+Bearbeitet die Zielladung in Prozent.
+
+**Entity-ID**: `number.evcc_{fahrzeug}_repeating_plan_{index}_soc`
+
+**Beispiel**: `number.evcc_elroq_repeating_plan_1_soc`
+
+**Bereich**: 0-100%
+ 
+ **Icon**: `mdi:battery-charging`
+ 
+ **Hinweis**: UI-Slider Schrittweite 10; Services dürfen jeden Integer 0–100 setzen.
+
+**Attribute**:
+```yaml
+vehicle_id: "db:1"
+vehicle_title: "Elroq"
+plan_index: 1
+unit_of_measurement: "%"
+```
+
+### Entity-Beispiel: Kompletter Ladeplan
+
+Für einen Plan werden **4 Entities** erstellt:
+
+```
+Ladeplan 1 (Elroq):
+├─ switch.evcc_elroq_repeating_plan_1_activ     → Anzeigename: "Ladeplan 1 Aktiv"
+├─ time.evcc_elroq_repeating_plan_1_time        → Anzeigename: "Ladeplan 1 Startzeit"
+├─ text.evcc_elroq_repeating_plan_1_weekdays    → Anzeigename: "Ladeplan 1 Wochentage"
+└─ number.evcc_elroq_repeating_plan_1_soc       → Anzeigename: "Ladeplan 1 Zielladung"
+```
+
+**Übersetzung (Deutsch/Englisch)**:
+- Entities zeigen automatisch deutsche oder englische Namen basierend auf HA-Sprache
+- Gesteuert via `translations/de.json` und `translations/en.json`
+- Translation Keys: `repeating_plan_activ`, `repeating_plan_time`, `repeating_plan_weekdays`, `repeating_plan_soc`
+
+### Indexierung: 1-basiert, keine führenden Nullen
+
+```
+Plan 1 → evcc_elroq_repeating_plan_1_activ
+Plan 2 → evcc_elroq_repeating_plan_2_time
+Plan 3 → evcc_elroq_repeating_plan_3_weekdays
+```
+
+**Nicht**: ~~`evcc_elroq_repeating_plan_01_activ`~~ (alte Version)
+
+---
+
 ## Architektur
 
 ```
@@ -140,9 +258,13 @@ __init__.py (async_setup_entry)
     ├─→ websocket_client.py (WS-Verbindung)
     ├─→ websocket_api.py (WebSocket-API für UI)
     ├─→ services.py (Service-Registrierung)
-    └─→ switch.py (Platform-Setup)
-           └─→ entity_manager.py (Entity-Lifecycle)
+    ├─→ switch.py (Plan Active/Inactive)
+    ├─→ time.py (Plan Start Time)
+    ├─→ text.py (Plan Weekdays)
+    └─→ number.py (Plan Target SOC)
+           └─→ entity_manager.py (Entity-Lifecycle mit suffix-Parameter)
                   └─→ mapping.py (ID-Generierung)
+   └─→ base_entity.py (gemeinsame Basisklasse)
 ```
 
 ### Kernkomponenten
@@ -403,7 +525,7 @@ plans[idx] = {...}                        # Aktualisiert korrekten Plan
 
 ### Entity-ID Generation
 
-**Neue Strategie (ab v0.0.4)**: Entity-IDs sind fahrzeugagnostisch und stabil über Fahrzeugwechsel:
+**Neue Strategie (seit v0.1.0)**: Entity-IDs sind fahrzeugagnostisch und stabil über Fahrzeugwechsel:
 
 ```python
 # Aus mapping.py:
@@ -428,7 +550,7 @@ build_entity_id("car-001", 3)  # "evcc_repeating_plan_03"
 {
   "domain": "evcc_scheduler",
   "name": "EVCC Scheduler",
-  "version": "0.0.4",
+   "version": "0.1.2",
   "documentation": "https://github.com/...",
   "requirements": [],
   "codeowners": ["@username"],
@@ -647,4 +769,4 @@ MIT License - Siehe LICENSE Datei
 ---
 
 **Zuletzt aktualisiert**: 24. Januar 2026  
-**Version**: 0.1.1
+**Version**: 0.1.2

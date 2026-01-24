@@ -15,7 +15,7 @@ MAJOR.MINOR.PATCH
 ### Aktuelle Version
 
 ```
-0.1.1
+0.1.2
 └─ First stable (0.x)
 ```
 
@@ -29,7 +29,8 @@ MAJOR.MINOR.PATCH
 | 0.0.4 | ✅ Veröffentlicht | Entity-ID Vereinfachung, Optimierungen |
 | 0.0.5 | ✅ Veröffentlicht | HACS Default Store, Home Assistant Brands |
 | 0.1.0 | ✅ Veröffentlicht | Stable Release, WS/Polling Konfiguration, WS API |
-| 0.1.1 | ✅ Veröffentlicht | Patch: Repo-Links/Codeowner auf diestrohs |
+| 0.1.1 | ✅ Veröffentlicht | Patch: Repo-Links/Codeowner auf diestrohs, Dokumentation aktualisiert |
+| 0.1.2 | ✅ Veröffentlicht | Patch: BaseEvccPlanEntity, Service-Optimierung, Icons, Dokumentation |
 
 ## Release-Prozess
 
@@ -48,7 +49,7 @@ Vor jedem Release:
 
 # manifest.json updaten
 {
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
 
 # hacs.json hat keine Version (kommt aus manifest.json)
@@ -59,9 +60,9 @@ Vor jedem Release:
 **Via GitHub Web UI**:
 
 1. Repository → Releases → Draft a new release
-2. **Tag**: `0.1.1` (exakt mit manifest.json)
+2. **Tag**: `0.1.2` (exakt mit manifest.json)
 3. **Target**: `master` (default branch)
-4. **Title**: `Release 0.1.1`
+4. **Title**: `Release 0.1.2`
 5. **Description**: (s. Beispiel unten)
 6. **Options**:
    - [ ] This is a pre-release (nur für Beta-Versionen)
@@ -71,15 +72,17 @@ Vor jedem Release:
 **Via Git CLI**:
 
 ```bash
-git tag 0.1.1
-git push origin 0.1.1
+git tag 0.1.2
+git push origin 0.1.2
 # Dann Release auf GitHub UI erstellen mit Notes
 ```
 
 ### 3. Release-Notes Vorlage
 
 ```markdown
-## 🎉 Release 0.1.1
+## 🎉 Release 0.1.2
+
+**Highlights**: BaseEvccPlanEntity, vereinheitlichtes Plattform-Setup, Service-Optimierung (weniger API-Calls), Icons (Time/Number), SOC-Slider Schrittweite 10
 
 ### What's new?
 
@@ -127,17 +130,19 @@ Thanks to:
 - Plus weitere...
 ```
 
-## Release-Notes für aktuelle Version (0.1.1)
+## Release-Notes für aktuelle Version (0.1.2)
 
 ```markdown
-## 🎉 Release 0.1.1
+## 🎉 Release 0.1.2
+
+**Highlights**: BaseEvccPlanEntity, vereinheitlichtes Plattform-Setup, Service-Optimierung (weniger API-Calls), Icons (Time/Number), SOC-Slider Schrittweite 10
 
 ### What's new?
 
 #### 🛠️ Maintenance
 - Repo-Links und Issue-Tracker auf `diestrohs/ha-evcc-scheduler` korrigiert
 - Codeowner im manifest aktualisiert
-- Patch-Bump auf 0.1.1 (keine funktionalen Änderungen)
+- Patch-Bump auf 0.1.2 (keine funktionalen Änderungen)
 
 ### 🔄 Dependencies
 
@@ -180,7 +185,7 @@ Keine bekannten Probleme in dieser Version.
 
 ### 🔮 Next Steps
 
-- Version 0.1.1: Bugfixes & HACS Review Tasks
+- Version 0.1.2: Bugfixes & HACS Review Tasks
 - Version 0.2.0: Erweiterte Scheduling-Features / Templates
 ```
 
@@ -267,5 +272,5 @@ fi
 
 ---
 
-**Letzte Aktualisierung**: Januar 2026  
-**Aktuelle Version**: 0.1.1
+**Letzte Aktualisierung**: 24. Januar 2026  
+**Aktuelle Version**: 0.1.2

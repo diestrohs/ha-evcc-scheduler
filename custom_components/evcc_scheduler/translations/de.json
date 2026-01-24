@@ -40,6 +40,28 @@
       }
     }
   },
+  "entity": {
+    "switch": {
+      "repeating_plan_activ": {
+        "name": "{vehicle_title} wiederkehrender Plan {index} aktiv"
+      }
+    },
+    "time": {
+      "repeating_plan_time": {
+        "name": "{vehicle_title} wiederkehrender Plan {index} Zeit"
+      }
+    },
+    "text": {
+      "repeating_plan_weekdays": {
+        "name": "{vehicle_title} wiederkehrender Plan {index} Wochentage"
+      }
+    },
+    "number": {
+      "repeating_plan_soc": {
+        "name": "{vehicle_title} wiederkehrender Plan {index} Ladeziel"
+      }
+    }
+  },
   "services": {
     "set_repeating_plan": {
       "name": "Wiederholten Plan festlegen",
@@ -59,7 +81,7 @@
         },
         "weekdays": {
           "name": "Wochentage",
-          "description": "Liste der Wochentage (0=Montag, 6=Sonntag)"
+          "description": "Liste der Wochentage (1=Montag, 2=Dienstag, 3=Mittwoch, 4=Donnerstag, 5=Freitag, 6=Samstag, 7=Sonntag)"
         },
         "soc": {
           "name": "Ladezustand",
@@ -89,7 +111,7 @@
   "entity": {
     "switch": {
       "weekly_plan": {
-        "name": "Plan {index}"
+        "name": "EVCC wiederkehrender Plan {index}"
       }
     }
   }

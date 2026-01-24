@@ -62,8 +62,9 @@ Settings → Devices and Services → + Create Integration
 config_flow.py ──→ __init__.py ──→ coordinator.py ──→ api.py
     ↓                  ↓
 websocket_client.py    entity_manager.py ←→ switch.py
-    ↓
-websocket_api.py (Custom Card API)
+    ↓                               ↓         time.py
+websocket_api.py                    ↓         text.py
+                                    ↓         number.py
 ```
 
 ---
@@ -129,6 +130,118 @@ logger:
 
 ---
 
+## Entities
+
+Die Integration erstellt für jeden Ladeplan **vier verschiedene Entity-Typen**, um alle Plan-Eigenschaften einzeln bearbeitbar zu machen:
+
+### Entity-Plattformen
+
+#### 1. Switch - Ladeplan Aktiv/Inaktiv
+
+Schaltet den Plan ein/aus.
+
+**Entity-ID**: `switch.evcc_{fahrzeug}_repeating_plan_{index}_activ`
+
+**Beispiel**: `switch.evcc_elroq_repeating_plan_1_activ`
+
+**Funktionsweise**:
+- ON: Plan wird ausgeführt
+- OFF: Plan ist deaktiviert
+- Toggle lädt alle Pläne, ändert nur `active`, speichert zurück
+
+**Attribute**:
+```yaml
+vehicle_id: "db:1"
+vehicle_title: "Elroq"
+plan_index: 1
+time: "07:00"
+weekdays: [1, 2, 3, 4, 5]
+soc: 80
+active: true
+```
+
+#### 2. Time - Ladeplan Startzeit
+
+Bearbeitet die Startzeit des Plans.
+
+**Entity-ID**: `time.evcc_{fahrzeug}_repeating_plan_{index}_time`
+
+**Beispiel**: `time.evcc_elroq_repeating_plan_1_time`
+
+**Format**: HH:MM (24-Stunden)
+
+**Attribute**:
+```yaml
+vehicle_id: "db:1"
+vehicle_title: "Elroq"
+plan_index: 1
+```
+
+#### 3. Text - Ladeplan Wochentage
+
+Bearbeitet die Wochentage als komma-getrennte Liste.
+
+**Entity-ID**: `text.evcc_{fahrzeug}_repeating_plan_{index}_weekdays`
+
+**Beispiel**: `text.evcc_elroq_repeating_plan_1_weekdays`
+
+**Format**: `"1,2,3,4,5"` (1=Montag, 7=Sonntag)
+
+**Attribute**:
+```yaml
+vehicle_id: "db:1"
+vehicle_title: "Elroq"
+plan_index: 1
+weekdays_list: [1, 2, 3, 4, 5]  # Array-Format für Automations
+```
+
+#### 4. Number - Ladeplan Zielladung
+
+Bearbeitet die Zielladung in Prozent.
+
+**Entity-ID**: `number.evcc_{fahrzeug}_repeating_plan_{index}_soc`
+
+**Beispiel**: `number.evcc_elroq_repeating_plan_1_soc`
+
+**Bereich**: 0-100%
+
+**Attribute**:
+```yaml
+vehicle_id: "db:1"
+vehicle_title: "Elroq"
+plan_index: 1
+unit_of_measurement: "%"
+```
+
+### Entity-Beispiel: Kompletter Ladeplan
+
+Für einen Plan werden **4 Entities** erstellt:
+
+```
+Ladeplan 1 (Elroq):
+├─ switch.evcc_elroq_repeating_plan_1_activ     → Anzeigename: "Ladeplan 1 Aktiv"
+├─ time.evcc_elroq_repeating_plan_1_time        → Anzeigename: "Ladeplan 1 Startzeit"
+├─ text.evcc_elroq_repeating_plan_1_weekdays    → Anzeigename: "Ladeplan 1 Wochentage"
+└─ number.evcc_elroq_repeating_plan_1_soc       → Anzeigename: "Ladeplan 1 Zielladung"
+```
+
+**Übersetzung (Deutsch/Englisch)**:
+- Entities zeigen automatisch deutsche oder englische Namen basierend auf HA-Sprache
+- Gesteuert via `translations/de.json` und `translations/en.json`
+- Translation Keys: `repeating_plan_activ`, `repeating_plan_time`, `repeating_plan_weekdays`, `repeating_plan_soc`
+
+### Indexierung: 1-basiert, keine führenden Nullen
+
+```
+Plan 1 → evcc_elroq_repeating_plan_1_activ
+Plan 2 → evcc_elroq_repeating_plan_2_time
+Plan 3 → evcc_elroq_repeating_plan_3_weekdays
+```
+
+**Nicht**: ~~`evcc_elroq_repeating_plan_01_activ`~~ (alte Version)
+
+---
+
 ## Architektur
 
 ```
@@ -141,8 +254,11 @@ __init__.py (async_setup_entry)
     ├─→ websocket_client.py (WS-Verbindung)
     ├─→ websocket_api.py (WebSocket-API für UI)
     ├─→ services.py (Service-Registrierung)
-    └─→ switch.py (Platform-Setup)
-           └─→ entity_manager.py (Entity-Lifecycle)
+    ├─→ switch.py (Plan Active/Inactive)
+    ├─→ time.py (Plan Start Time)
+    ├─→ text.py (Plan Weekdays)
+    └─→ number.py (Plan Target SOC)
+           └─→ entity_manager.py (Entity-Lifecycle mit suffix-Parameter)
                   └─→ mapping.py (ID-Generierung)
 ```
 
@@ -183,19 +299,53 @@ __init__.py (async_setup_entry)
 - **Non-Blocking**: Läuft in separatem Task, blockiert nicht den HA Event Loop
 
 #### `entity_manager.py` - Entity-Lifecycle
-- **Aufgabe**: Synchronisiert Entities mit Coordinator-Daten
+- **Aufgabe**: Synchronisiert Entities mit Coordinator-Daten (Multi-Plattform-Support)
+- **Konstruktor**: `__init__(hass, async_add_entities, suffix="")` - suffix für verschiedene Entity-Typen
 - **Sync-Prozess**:
   1. Vergleicht `wanted_ids` (aus Plänen) mit `current_ids` (in `self.entities`)
   2. Neue Entities: Erstellen und registrieren
   3. Bestehende Entities: Plan-Daten aktualisieren
   4. Entfernte Entities: Aus Dictionary entfernen + aus Registry löschen
+- **Suffix-Handling**: Base-ID `evcc_{vehicle}_repeating_plan_{index}_activ` wird transformiert zu `_time`, `_weekdays`, `_soc`
 - **Registry-Cleanup**: `async_remove()` bei jedem unload + bei async_unload_entry()
 
-#### `switch.py` - Switch Platform
+#### `switch.py` - Switch Platform (Active/Inactive Toggle)
 - **Entität**: `EvccPlanSwitch` für jeden Plan
-- **Attribute**: Plan-Details als `extra_state_attributes()`
-- **Toggle**: `async_turn_on/off()` → API-Aufruf → `coordinator.async_request_refresh()`
-- **1-basierte Indexierung**: UI zeigt Plan 1,2,3; Array ist 0-indexed
+- **Entity-ID**: `evcc_{vehicle}_repeating_plan_{index}_activ` (1-basiert, z.B. `evcc_elroq_repeating_plan_1_activ`)
+- **Translation Key**: `repeating_plan_activ` ("Ladeplan 1 Aktiv")
+- **Icon**: Systemstandard
+- **Attribute**: Alle Plan-Felder (`time`, `weekdays`, `soc`, `active`) + `vehicle_id`, `vehicle_title`
+- **Toggle**: `async_turn_on/off()` → Lädt alle Pläne, ändert `active`, speichert zurück → `coordinator.async_request_refresh()`
+- **1-basierte Indexierung**: UI zeigt Plan 1,2,3; intern `plans[self.index - 1]` (0-basiert)
+
+#### `time.py` - Time Platform (Start Time Editor)
+- **Entität**: `EvccPlanTime` für jeden Plan
+- **Entity-ID**: `evcc_{vehicle}_repeating_plan_{index}_time` (z.B. `evcc_elroq_repeating_plan_1_time`)
+- **Translation Key**: `repeating_plan_time` ("Ladeplan 1 Startzeit")
+- **Icon**: `mdi:clock-digital`
+- **Format**: HH:MM (24-Stunden-Format)
+- **Attribute**: `vehicle_id`, `vehicle_title`, `plan_index`
+- **Update**: `async_set_value()` → Validiert Format → API-Update → Coordinator-Refresh
+
+#### `text.py` - Text Platform (Weekdays Editor)
+- **Entität**: `EvccPlanWeekdays` für jeden Plan
+- **Entity-ID**: `evcc_{vehicle}_repeating_plan_{index}_weekdays` (z.B. `evcc_elroq_repeating_plan_1_weekdays`)
+- **Translation Key**: `repeating_plan_weekdays` ("Ladeplan 1 Wochentage")
+- **Format**: Komma-getrennt "1,2,3,4,5" (1=Montag, 7=Sonntag)
+- **Attribute**: `vehicle_id`, `vehicle_title`, `plan_index`, `weekdays_list` (Array-Format)
+- **Validierung**: Prüft 1-7 Bereich, filtert Duplikate
+- **Update**: `async_set_value()` → Parse "1,2,3" zu [1,2,3] → API-Update → Refresh
+
+#### `number.py` - Number Platform (Target SOC Editor)
+- **Entität**: `EvccPlanSoc` für jeden Plan
+- **Entity-ID**: `evcc_{vehicle}_repeating_plan_{index}_soc` (z.B. `evcc_elroq_repeating_plan_1_soc`)
+- **Translation Key**: `repeating_plan_soc` ("Ladeplan 1 Zielladung")
+- **Icon**: `mdi:battery-charging`
+- **Bereich**: 0-100% (Slider)
+- **Einheit**: "%"
+- **Attribute**: `vehicle_id`, `vehicle_title`, `plan_index`
+- **Update**: `async_set_native_value()` → Validiert 0-100 → API-Update → Refresh
+ - **Hinweis**: UI-Slider nutzt Schrittweite 10; Services können jeden Integer 0–100 setzen.
 
 #### `services.py` - Service-Registrierung
 - **Services**:
@@ -206,9 +356,12 @@ __init__.py (async_setup_entry)
 
 #### `mapping.py` - Hilfsfunktionen
 - `extract_plans()`: Konvertiert EVCC-State zu vehicles-Dict
-- `build_entity_id()`: Generiert eindeutige Entity-IDs
-  - Format: `evcc_{fahrzeug}_{index}`
-  - Beispiel: `evcc_elroq_repeating_plan_01`
+- `build_entity_id(vehicle_id, index, title)`: Generiert Base-Entity-ID (mit `_activ` Suffix)
+  - Format: `evcc_{fahrzeug}_repeating_plan_{index}_activ`
+  - Index: 1-basiert OHNE führende Nullen (Plan 1, nicht Plan 01)
+  - Beispiel: `build_entity_id("db:1", 1, "Elroq")` → `"evcc_elroq_repeating_plan_1_activ"`
+  - Sanitization: `.lower().replace(":", "_")` für EVCC-IDs
+- **Nutzung in Plattformen**: Suffix wird ausgetauscht: `base_id.replace("_activ", "_time")`, etc.
 
 #### `websocket_api.py` - WebSocket-API für Custom Card
 - **Aufgabe**: Ermöglicht Custom Lovelace Card, Daten zu holen
@@ -381,7 +534,7 @@ data:
 
 | Kontext | Indexierung | Beispiel |
 |---------|-------------|----------|
-| Home Assistant Entity-Name | 1-basiert | `evcc_elroq_repeating_plan_01`, `_02`, `_03` |
+| Home Assistant Entity-Name | 1-basiert (keine Nullen) | `evcc_elroq_repeating_plan_1_activ`, `_2_activ`, `_3_activ` |
 | Entity-ID in UI/Services | 1-basiert | Plan 1, Plan 2, Plan 3 |
 | EVCC JSON Array | 0-basiert | `plans[0]`, `plans[1]`, `plans[2]` |
 | Interner Code | 0-basiert für Arrays | `idx = plan_index - 1` |
@@ -402,17 +555,23 @@ plans[idx] = {...}                        # Aktualisiert korrekten Plan
 def build_entity_id(vehicle_id: str, index: int, title: str = None) -> str:
     base = title if title else vehicle_id
     safe_name = base.lower().replace(":", "_").replace("-", "_").replace(" ", "_")
-    return f"evcc_{safe_name}_repeating_plan_{index:02d}"
+    return f"evcc_{safe_name}_repeating_plan_{index}_activ"  # Base-ID mit _activ
 
-# Beispiele:
-build_entity_id("db:1", 1, "Elroq")    # "evcc_elroq_repeating_plan_01"
-build_entity_id("db:2", 1, "Eniaq")    # "evcc_eniaq_repeating_plan_01"
-build_entity_id("car-001", 3, "Tesla") # "evcc_tesla_repeating_plan_03"
+# Beispiele (Base-ID mit _activ Suffix):
+build_entity_id("db:1", 1, "Elroq")    # "evcc_elroq_repeating_plan_1_activ"
+build_entity_id("db:2", 2, "Eniaq")    # "evcc_eniaq_repeating_plan_2_activ"
+build_entity_id("car-001", 3, "Tesla") # "evcc_tesla_repeating_plan_3_activ"
+
+# In den Entity-Plattformen wird Suffix getauscht:
+# switch.py: "...plan_1_activ" (direkt)
+# time.py: base_id.replace("_activ", "_time") → "...plan_1_time"
+# text.py: base_id.replace("_activ", "_weekdays") → "...plan_1_weekdays"
+# number.py: base_id.replace("_activ", "_soc") → "...plan_1_soc"
 ```
 
 ---
 
-## Konfiguration
+## Konfiguration & Architektur-Updates
 
 ### Manifesto (manifest.json)
 
@@ -420,17 +579,21 @@ build_entity_id("car-001", 3, "Tesla") # "evcc_tesla_repeating_plan_03"
 {
   "domain": "evcc_scheduler",
   "name": "EVCC Scheduler",
-  "version": "0.0.4",
-  "documentation": "https://github.com/...",
-  "requirements": [],
-  "codeowners": ["@username"],
+   "version": "0.1.2",
+  "documentation": "https://github.com/diestrohs/ha-evcc-scheduler",
+  "requirements": ["aiohttp>=3.8.0"],
+  "codeowners": ["@diestrohs"],
   "config_flow": true,
   "iot_class": "local_polling",
   "integration_type": "service",
-  "platforms": ["switch"],
+  "platforms": ["switch", "time", "text", "number"],
   "homeassistant": "2025.12.0"
 }
 ```
+
+### Gemeinsame Basisklasse
+
+Die Entities erben von `base_entity.py` (`BaseEvccPlanEntity`), welche gemeinsame Felder (`vehicle_id`, `plan_index`, `vehicle_title`), `update_data()` und eine Hilfsfunktion zur ID-Erzeugung (`make_unique_id`) bereitstellt.
 
 ### Const (const.py)
 
@@ -438,13 +601,16 @@ build_entity_id("car-001", 3, "Tesla") # "evcc_tesla_repeating_plan_03"
 DOMAIN = "evcc_scheduler"
 DEFAULT_PORT = 7070
 DEFAULT_TIMEOUT = 10
-CONF_TIMEOUT = "timeout"
-CONF_SSL = "ssl"
-CONF_MODE = "mode"
-CONF_POLL_INTERVAL = "poll_interval"
-MODE_WEBSOCKET = "websocket"
-MODE_POLLING = "polling"
+DEFAULT_WEBSOCKET = True
+DEFAULT_WS_API = False
 DEFAULT_POLL_INTERVAL = 30
+CONF_HOST = "host"
+CONF_PORT = "port"
+CONF_TOKEN = "token"
+CONF_SSL = "ssl"
+CONF_WEBSOCKET = "websocket"
+CONF_WS_API = "websocket_api"
+CONF_POLL_INTERVAL = "poll_interval"
 ```
 
 ---
@@ -639,5 +805,5 @@ MIT License - Siehe LICENSE Datei
 
 ---
 
-**Zuletzt aktualisiert**: 20. Januar 2026  
-**Version**: 0.0.4
+**Zuletzt aktualisiert**: 24. Januar 2026  
+**Version**: 0.1.2
