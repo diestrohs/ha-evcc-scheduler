@@ -40,6 +40,13 @@ set_repeating_plan:
         number:
           min: 0
           max: 100
+    precondition:
+      description: Precondition value (default 0).
+      example: 0
+      required: false
+      selector:
+        number:
+          min: 0
     active:
       description: Whether the plan is active. Required when creating a new plan (plan_index omitted).
       example: true

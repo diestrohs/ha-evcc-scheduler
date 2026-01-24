@@ -47,6 +47,9 @@ async def async_setup_services(hass: HomeAssistant):
                 raise ServiceValidationError("'tz' muss eine IANA-Zeitzone sein, z.B. 'Europe/Berlin'")
             new_plan["tz"] = tz_val
 
+        # Precondition mit Default 0
+        new_plan["precondition"] = call.data.get("precondition", 0)
+
         if plan_index is None:
             # Neuer Plan: Pflichtfelder prüfen
             required_fields = ["time", "tz", "weekdays", "soc", "active"]
