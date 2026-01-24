@@ -3,7 +3,7 @@ from .coordinator import EvccCoordinator
 from .websocket_client import EvccWebsocketClient
 from .websocket_api import EvccWebSocketAPI, async_register_ws_commands
 from .services import async_setup_services
-from .const import DOMAIN, DEFAULT_PORT, CONF_WS_API, DEFAULT_WS_API
+from .const import DOMAIN, DEFAULT_PORT, CONF_WEBSOCKET, DEFAULT_WEBSOCKET, CONF_WS_API, DEFAULT_WS_API, CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL
 import logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -14,18 +14,25 @@ PLATFORMS = ["switch"]
 async def async_setup_entry(hass, entry):
     host = entry.data["host"]
     port = entry.data.get("port", DEFAULT_PORT)
+    use_websocket = entry.data.get(CONF_WEBSOCKET, DEFAULT_WEBSOCKET)
     ws_api_enabled = entry.data.get(CONF_WS_API, DEFAULT_WS_API)
+    poll_interval = entry.data.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)
 
     api = EvccApiClient(host, port)
-    coordinator = EvccCoordinator(hass, api)
+    coordinator = EvccCoordinator(hass, api, poll_interval)
 
-    async def websocket_update(data):
-        _LOGGER.debug("WebSocket update received, triggering coordinator refresh")
-        await coordinator.async_request_refresh()
+    # WebSocket nur verbinden wenn aktiviert
+    if use_websocket:
+        async def websocket_update(data):
+            _LOGGER.debug("WebSocket update received, triggering coordinator refresh")
+            await coordinator.async_request_refresh()
 
-    ws = EvccWebsocketClient(host, port, websocket_update)
-    await ws.connect()
-    _LOGGER.info("EVCC WebSocket client connected for instant updates")
+        ws = EvccWebsocketClient(host, port, websocket_update)
+        await ws.connect()
+        _LOGGER.info("EVCC WebSocket client connected for instant updates")
+    else:
+        ws = None
+        _LOGGER.info("WebSocket disabled, using polling only (interval: %ds)", poll_interval)
 
     # Setup WebSocket API für Custom-Card (experimentell/ungestestet)
     if ws_api_enabled:
@@ -67,7 +74,11 @@ async def async_unload_entry(hass, entry):
     
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     coordinator = hass.data[DOMAIN].pop(entry.entry_id)
-    await coordinator.ws.disconnect()
+    
+    # Disconnect WebSocket nur wenn vorhanden
+    if coordinator.ws:
+        await coordinator.ws.disconnect()
+    
     await coordinator.api.close()
     
     # Cleanup WebSocket API

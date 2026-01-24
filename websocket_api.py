@@ -183,16 +183,29 @@ async def ws_add_scheduler(hass: HomeAssistant, connection, msg) -> None:
 
         plans.append(new_plan)
         await coordinator.api.set_repeating_plans(vehicle_id, plans)
-        await coordinator.async_request_refresh()
 
         # Konvertiere Pläne zurück zu User-Format für Response/Broadcast
         user_plans = [
             {**plan, "weekdays": _convert_weekdays_to_user(plan.get("weekdays"))}
             for plan in plans
         ]
+        
+        # Sofort Update (nicht blockierend)
+        updated_data = coordinator.data or {}
+        updated_vehicles = updated_data.get("vehicles", {}).copy()
+        updated_vehicles[vehicle_id] = {
+            "title": updated_vehicles.get(vehicle_id, {}).get("title", vehicle_id),
+            "repeatingPlans": plans
+        }
+        coordinator.async_set_updated_data({"vehicles": updated_vehicles, "id_map": coordinator.id_map})
+        
+        # Trigger Refresh im Hintergrund
+        coordinator.async_request_refresh()
+        
+        # Broadcast sofort nach lokaler Update
         api = hass.data.get("evcc_scheduler_ws_api")
         if api:
-            await api.broadcast({"type": "plans_updated", "vehicle_id": vehicle_id, "plans": user_plans})
+            api.broadcast({"type": "plans_updated", "vehicle_id": vehicle_id, "plans": user_plans})
 
         connection.send_result(msg["id"], {"vehicle_id": vehicle_id, "plans": user_plans})
     except Exception as err:
@@ -227,16 +240,29 @@ async def ws_edit_scheduler(hass: HomeAssistant, connection, msg) -> None:
             plans[plan_index]["weekdays"] = _convert_weekdays_to_api(msg["weekdays"])
 
         await coordinator.api.set_repeating_plans(vehicle_id, plans)
-        await coordinator.async_request_refresh()
 
         # Konvertiere Pläne zurück zu User-Format für Response/Broadcast
         user_plans = [
             {**plan, "weekdays": _convert_weekdays_to_user(plan.get("weekdays"))}
             for plan in plans
         ]
+        
+        # Sofort Update (nicht blockierend)
+        updated_data = coordinator.data or {}
+        updated_vehicles = updated_data.get("vehicles", {}).copy()
+        updated_vehicles[vehicle_id] = {
+            "title": updated_vehicles.get(vehicle_id, {}).get("title", vehicle_id),
+            "repeatingPlans": plans
+        }
+        coordinator.async_set_updated_data({"vehicles": updated_vehicles, "id_map": coordinator.id_map})
+        
+        # Trigger Refresh im Hintergrund
+        coordinator.async_request_refresh()
+        
+        # Broadcast sofort nach lokaler Update
         api = hass.data.get("evcc_scheduler_ws_api")
         if api:
-            await api.broadcast({"type": "plans_updated", "vehicle_id": vehicle_id, "plans": user_plans})
+            api.broadcast({"type": "plans_updated", "vehicle_id": vehicle_id, "plans": user_plans})
 
         connection.send_result(msg["id"], {"vehicle_id": vehicle_id, "plans": user_plans})
     except Exception as err:
@@ -265,16 +291,29 @@ async def ws_delete_scheduler(hass: HomeAssistant, connection, msg) -> None:
 
         plans.pop(plan_index)
         await coordinator.api.set_repeating_plans(vehicle_id, plans)
-        await coordinator.async_request_refresh()
 
         # Konvertiere Pläne zurück zu User-Format für Response/Broadcast
         user_plans = [
             {**plan, "weekdays": _convert_weekdays_to_user(plan.get("weekdays"))}
             for plan in plans
         ]
+        
+        # Sofort Update (nicht blockierend)
+        updated_data = coordinator.data or {}
+        updated_vehicles = updated_data.get("vehicles", {}).copy()
+        updated_vehicles[vehicle_id] = {
+            "title": updated_vehicles.get(vehicle_id, {}).get("title", vehicle_id),
+            "repeatingPlans": plans
+        }
+        coordinator.async_set_updated_data({"vehicles": updated_vehicles, "id_map": coordinator.id_map})
+        
+        # Trigger Refresh im Hintergrund
+        coordinator.async_request_refresh()
+        
+        # Broadcast sofort nach lokaler Update
         api = hass.data.get("evcc_scheduler_ws_api")
         if api:
-            await api.broadcast({"type": "plans_updated", "vehicle_id": vehicle_id, "plans": user_plans})
+            api.broadcast({"type": "plans_updated", "vehicle_id": vehicle_id, "plans": user_plans})
 
         connection.send_result(msg["id"], {"vehicle_id": vehicle_id, "plans": user_plans})
     except Exception as err:

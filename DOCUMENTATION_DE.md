@@ -179,33 +179,37 @@ __init__.py (async_setup_entry)
 - **Non-Blocking**: Läuft in separatem Task, blockiert nicht den HA Event Loop
 
 #### `entity_manager.py` - Entity-Lifecycle
-- **Aufgabe**: Synchronisiert Entities mit Coordinator-Daten
-- **Sync-Prozess**:
-  1. Vergleicht `wanted_ids` (aus Plänen) mit `current_ids` (in `self.entities`)
-  2. Neue Entities: Erstellen und registrieren
-  3. Bestehende Entities: Plan-Daten aktualisieren
-  4. Entfernte Entities: Aus Dictionary entfernen + aus Registry löschen
-- **Registry-Cleanup**: `async_remove()` bei jedem unload + bei async_unload_entry()
+- **Aufgabe**: Synchronisiert Entities mit Coordinator-Daten (optimiert für Wiederverwendung)
+- **Sync-Strategie**:
+  1. **Updates**: Bestehende Entities via `update_data()` aktualisieren (0 Registry-Zugriffe)
+  2. **Neue**: Nur anlegen, wenn Plan-Anzahl steigt
+  3. **Gelöschte**: Nur entfernen, wenn Plan-Anzahl sinkt (Registry-Cleanup nur dann)
+- **Vorteile**: 
+  - Fahrzeugwechsel mit gleicher Plan-Anzahl → Keine Registry-Zugriffe
+  - Entity-IDs bleiben stabil
+  - Automations/Scripts funktionieren ohne Neustart nach Fahrzeugwechsel
 
 #### `switch.py` - Switch Platform
 - **Entität**: `EvccPlanSwitch` für jeden Plan
-- **Attribute**: Plan-Details als `extra_state_attributes()`
+- **Attribute**:
+  - Plan-Details: `time`, `weekdays`, `soc`, `active`
+  - Fahrzeug-Info: `vehicle_title`, `vehicle_id` (neu!)
 - **Toggle**: `async_turn_on/off()` → API-Aufruf → `coordinator.async_request_refresh()`
-- **1-basierte Indexierung**: UI zeigt Plan 1,2,3; Array ist 0-indexed
+- **Effiziente Updates**: `update_data()` Methode für Fahrzeugwechsel (keine Entity-Neuerstellung)
 
 #### `services.py` - Service-Registrierung
 - **Services**:
   - `evcc_scheduler.set_repeating_plan`
   - `evcc_scheduler.del_repeating_plan`
-  - `evcc_scheduler.toggle_plan_active`
 - **Validierung**: Prüft Fahrzeug-ID, Verfügbarkeit, Plan-Index
 - **Fehlerbehandlung**: `ServiceValidationError` mit aussagekräftigen Meldungen
 
 #### `mapping.py` - Hilfsfunktionen
 - `extract_plans()`: Konvertiert EVCC-State zu vehicles-Dict
-- `build_entity_id()`: Generiert eindeutige Entity-IDs
-  - Format: `evcc_{fahrzeug}_{index}`
-  - Beispiel: `evcc_elroq_repeating_plan_01`
+- `build_entity_id()`: Generiert eindeutige Entity-IDs (fahrzeugag-nostisch)
+  - Format: `evcc_repeating_plan_{index}`
+  - Beispiel: `evcc_repeating_plan_1`, `evcc_repeating_plan_2`
+  - Vorteil: Entity-IDs bleiben bei Fahrzeugwechsel stabil
 
 #### `websocket_api.py` - WebSocket-API für Custom Card
 - **Aufgabe**: Ermöglicht Custom Lovelace Card, Daten zu holen
@@ -225,54 +229,17 @@ __init__.py (async_setup_entry)
 
 ## Services
 
-### `evcc_scheduler.set_repeating_plan`
+### Plan aktiv/inaktiv über `evcc_scheduler.set_repeating_plan`
 
-**Beschreibung**: Erstelle oder aktualisiere einen wiederkehrenden Ladeplan
+Setze das Feld `active` für bestehende Pläne (anstelle eines separaten Toggle-Services):
 
-**Parameter**:
-```yaml
-service: evcc_scheduler.set_repeating_plan
-data:
-  vehicle_id: "db:1"           # Fahrzeug-ID (erforderlich)
-  plan_index: 1                # Optional: 1-basiert, null = neuer Plan anhängen
-  time: "07:00"                # Startzeit (HH:MM)
-  weekdays: [1, 2, 3, 4, 5]    # Wochentage (1=Mo, 7=So)
-  soc: 80                       # Ladeziel in % (10-100)
-  active: true                  # Plan aktiv/inaktiv
-```
-
-**Pflicht-/Optionale Felder**:
-| Feld | Pflicht? | Hinweis |
-|------|----------|---------|
-| `vehicle_id` | Ja | EVCC Fahrzeug-ID (z.B. `db:1`) |
-| `plan_index` | Nein | 1-basiert; wenn weggelassen/0 → Plan wird angehängt |
-| `time` | Ja | HH:MM (24h) |
-| `weekdays` | Ja | Liste 1-7 (1=Mo … 7=So) |
-| `soc` | Ja | Ziel-SOC in % (10-100) |
-| `active` | Nein | true/false, Standard: true |
-
-**Fehlerbehandlung**:
-| Fehler | Meldung |
-|--------|---------|
-| Kein Fahrzeug gewählt | "Kein Fahrzeug in EVCC gewählt" |
-| Fahrzeug-ID falsch | "Die Fahrzeug-ID 'db:1' stimmt nicht mit der gewählten Fahrzeug-ID in EVCC 'db:2' überein" |
-| Fahrzeug nicht angelegt | "Das Fahrzeug 'db:99' ist in EVCC nicht angelegt. Verfügbare Fahrzeuge: db:1, db:2" |
-| Plan-Index ungültig | "Plan-Index 99 ungültig" |
-
-**Beispiele**:
-
-Neuen Plan erstellen:
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
-  time: "22:00"
-  weekdays: [1, 2, 3, 4, 5]
-  soc: 100
+  plan_index: 1
   active: true
 ```
-
-Existierenden Plan aktualisieren:
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
@@ -307,54 +274,6 @@ service: evcc_scheduler.del_repeating_plan
 data:
   vehicle_id: "db:1"
   plan_index: 2
-```
-
-### `evcc_scheduler.toggle_plan_active`
-
-**Beschreibung**: Schalte Plan aktiv/inaktiv oder toggle
-
-**Parameter**:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"        # Fahrzeug-ID (erforderlich)
-  plan_index: 1             # Plan-Index 1-basiert (erforderlich)
-  active: true              # Optional: true/false setzen, null = toggle
-```
-
-**Pflicht-/Optionale Felder**:
-| Feld | Pflicht? | Hinweis |
-|------|----------|---------|
-| `vehicle_id` | Ja | EVCC Fahrzeug-ID (z.B. `db:1`) |
-| `plan_index` | Ja | 1-basiert, muss existieren |
-| `active` | Nein | Wenn weggelassen → toggle; sonst true/false setzen |
-
-**Beispiele**:
-
-Plan aktivieren:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-  active: true
-```
-
-Plan deaktivieren:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-  active: false
-```
-
-Plan toggle:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
 ```
 
 ---
@@ -481,18 +400,20 @@ plans[idx] = {...}                        # Aktualisiert korrekten Plan
 
 ### Entity-ID Generation
 
+**Neue Strategie (ab v0.0.4)**: Entity-IDs sind fahrzeugagnostisch und stabil über Fahrzeugwechsel:
+
 ```python
 # Aus mapping.py:
-def build_entity_id(vehicle_id: str, index: int, title: str = None) -> str:
-    base = title if title else vehicle_id
-    safe_name = base.lower().replace(":", "_").replace("-", "_").replace(" ", "_")
-    return f"evcc_{safe_name}_repeating_plan_{index:02d}"
+def build_entity_id(vehicle_id: str, index: int) -> str:
+    return f"evcc_repeating_plan_{index}"
 
 # Beispiele:
-build_entity_id("db:1", 1, "Elroq")    # "evcc_elroq_repeating_plan_01"
-build_entity_id("db:2", 1, "Eniaq")    # "evcc_eniaq_repeating_plan_01"
-build_entity_id("car-001", 3, "Tesla") # "evcc_tesla_repeating_plan_03"
+build_entity_id("db:1", 1)  # "evcc_repeating_plan_1"
+build_entity_id("db:2", 1)  # "evcc_repeating_plan_1" (gleiche ID!)
+build_entity_id("car-001", 3)  # "evcc_repeating_plan_03"
 ```
+
+**Vorteil**: Automations/Scripts sind fahrzeugwechsel-resistent. Die Entity-ID für "Plan 1" ist immer `switch.evcc_repeating_plan_1`, egal welches Fahrzeug aktiv ist.
 
 ---
 
@@ -550,10 +471,11 @@ logger:
 
 | Log-Level | Beispiel | Bedeutung |
 |-----------|----------|-----------|
-| DEBUG | `Found active vehicle in loadpoint: db:1` | Fahrzeug erkannt |
-| INFO | `Loaded 3 plans for active vehicle: Elroq` | Plans geladen |
-| INFO | `Created plan entity: evcc_elroq_repeating_plan_01` | Entity erstellt |
-| INFO | `Removing plan entity: evcc_elroq_repeating_plan_02` | Entity gelöscht |
+| DEBUG | `Entity sync: found 1 vehicles` | Sync-Start |
+| INFO | `Vehicle db:1 (Elroq) has 2 plans` | Fahrzeug + Plan-Anzahl erkannt |
+| INFO | `Updated plan entity: evcc_repeating_plan_1` | Entity aktualisiert (kein Registry-Zugriff) |
+| INFO | `Created plan entity: evcc_repeating_plan_03` | Entity erstellt (mehr Pläne) |
+| INFO | `Removing plan entity: evcc_repeating_plan_04` | Entity gelöscht (weniger Pläne) |
 | WARNING | `Vehicle db:99 not found in EVCC vehicles data` | Fahrzeug nicht vorhanden |
 | ERROR | `Failed to create entity xyz: ...` | Entity-Erstellung fehlgeschlagen |
 

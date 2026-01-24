@@ -5,12 +5,14 @@
         "title": "EVCC Scheduler",
         "description": "Configure your EVCC Scheduler integration",
         "data": {
+          "name": "Name (optional)",
           "host": "Host",
           "port": "Port",
           "token": "Authentication Token (optional)",
-          "ssl": "Use SSL",
-          "timeout": "Timeout (seconds)",
-          "mode": "Communication Mode"
+          "ssl": "SSL secured connection (https://)",
+          "websocket": "Use Websocket - Polling interval will be ignored",
+          "poll_interval": "Polling Interval (seconds)",
+          "websocket_api": "Websocket API - Interface for a specific Lovelace Card"
         }
       }
     },
@@ -25,12 +27,14 @@
         "title": "EVCC Scheduler Options",
         "description": "Update EVCC Scheduler settings",
         "data": {
+          "name": "Name (optional)",
           "host": "Host",
           "port": "Port",
           "token": "Authentication Token (optional)",
-          "ssl": "Use SSL",
-          "timeout": "Timeout (seconds)",
-          "mode": "Communication Mode"
+          "ssl": "SSL secured connection (https://)",
+          "websocket": "Use Websocket - Polling interval will be ignored",
+          "poll_interval": "Polling Interval (seconds)",
+          "websocket_api": "Websocket API - Interface for a specific Lovelace Card"
         }
       }
     }
@@ -46,7 +50,7 @@
         },
         "plan_index": {
           "name": "Plan Index",
-          "description": "The index of the plan to modify (0-based). Omit to create a new plan."
+          "description": "The index of the plan to modify (1-based, starting from 1). Omit to create a new plan."
         },
         "time": {
           "name": "Time",
@@ -76,25 +80,7 @@
         },
         "plan_index": {
           "name": "Plan Index",
-          "description": "The index of the plan to delete (0-based)"
-        }
-      }
-    },
-    "toggle_plan_active": {
-      "name": "Toggle Plan Active",
-      "description": "Toggle the active status of a repeating plan.",
-      "fields": {
-        "vehicle_id": {
-          "name": "Vehicle ID",
-          "description": "The ID of the vehicle (e.g., 'db:1')"
-        },
-        "plan_index": {
-          "name": "Plan Index",
-          "description": "The index of the plan to toggle (0-based)"
-        },
-        "active": {
-          "name": "Active",
-          "description": "Set to true/false to turn on/off, omit to toggle"
+          "description": "The index of the plan to delete (1-based, starting from 1)"
         }
       }
     }

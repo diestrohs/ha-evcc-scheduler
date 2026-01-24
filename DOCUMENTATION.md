@@ -1,12 +1,12 @@
-# EVCC Scheduler - Dokumentation
+# EVCC Scheduler - Documentation
 
-## Übersicht
+## Overview
 
-**EVCC Scheduler** ist eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepläne über die EVCC API. Die Integration synchronisiert die Fahrzeugauswahl mit EVCC und bietet eine zentrale Verwaltung von Ladeplänen mit automatischer Entfernung verwaister Entities.
+**EVCC Scheduler** is a Home Assistant custom integration for managing recurring EV charging schedules via the EVCC API. The integration synchronizes vehicle selection with EVCC and provides centralized management of charging schedules with automatic cleanup of orphaned entities.
 
-**Lizenz:** MIT  
+**License:** MIT  
 **Repository:** [GitHub](https://github.com/diestrohs/ha-evcc-scheduler)  
-**HACS:** ✅ Kompatibel & verfügbar  
+**HACS:** ✅ Compatible & Available  
 **Home Assistant:** 2025.12.0+  
 **EVCC:** 0.210.2+
 
@@ -14,102 +14,106 @@
 
 ## Quick Start 🚀
 
-### 1. Installation mit HACS (1 Minute)
+### 1. Installation with HACS (1 Minute)
 
 ```
-HACS → Integrationen → ⋮ → Custom Repositories
+HACS → Integrations → ⋮ → Custom Repositories
 → https://github.com/diestrohs/ha-evcc-scheduler
-→ Kategorie: Integration
-→ Suche: EVCC Scheduler → Installieren
-→ Home Assistant neu starten ⭐ WICHTIG
+→ Category: Integration
+→ Search: EVCC Scheduler → Install
+→ Restart Home Assistant ⭐ IMPORTANT
 ```
 
-### 2. Konfiguration (2 Minuten)
+### 2. Configuration (2 Minutes)
 
 ```
-Einstellungen → Geräte und Services → + Integration erstellen
-→ Suche: EVCC Scheduler
-→ Host: 192.168.1.100 (EVCC-IP)
-→ Port: 7070 (Standard)
-→ Bestätigen ✅
+Settings → Devices and Services → + Create Integration
+→ Search: EVCC Scheduler
+→ Host: 192.168.1.100 (EVCC IP)
+→ Port: 7070 (Default)
+→ Confirm ✅
 ```
 
-### 3. Fertig! 🎉
+### 3. Done! 🎉
 
-- Entities werden automatisch erstellt
-- Services stehen zur Verfügung
-- WebSocket läuft für Echtzeit-Updates
+- Entities are created automatically
+- Services are available immediately
+- WebSocket runs for real-time updates
 
 ---
 
-## Funktionalität
+## Features
 
-### Kerenfunktionen
+### Core Features
 
-- ✅ **Automatische Fahrzeugauswahl**: Erkennt das in EVCC gewählte Fahrzeug automatisch
-- ✅ **Dynamische Entity-Verwaltung**: Erstellt/löscht Entities basierend auf aktuellem Fahrzeug
-- ✅ **WebSocket-Integration**: Echtzeit-Updates bei Änderungen in EVCC
-- ✅ **Service-Registrierung**: CRUD-Operationen für Ladepläne
-- ✅ **Entity Registry Cleanup**: Automatisches Löschen verwaister Entities
-- ✅ **Multi-Fahrzeug-Support**: Wechsel zwischen mehreren Fahrzeugen mit automatischer Entity-Migration
-- ✅ **Fehlervalidation**: Aussagekräftige Fehlermeldungen bei Service-Aufrufen
+- ✅ **Automatic Vehicle Selection**: Detects the selected vehicle in EVCC automatically
+- ✅ **Dynamic Entity Management**: Creates/deletes entities based on current vehicle
+- ✅ **Real-time Synchronization**: WebSocket updates with fallback to polling (30s)
+- ✅ **Plan Management**: Services for creating, updating, deleting plans
+- ✅ **Entity Registry Cleanup**: Removes orphaned entities on restart
+- ✅ **Multi-Vehicle Support**: Handles multiple vehicles with automatic entity migration
+- ✅ **Localized Messages**: German error messages with fallback to English
+- ✅ **Type Hints**: Ready for future mypy integration
+- ✅ **Home Assistant Standards**: Follows HA integration best practices
 
-### Unterstützte Fahrzeuge
+### Architecture
 
-Alle Fahrzeuge, die in EVCC konfiguriert sind:
-- Tesla (Model S, 3, X, Y)
-- Volkswagen (ID.4, ID.5, ID. Buzz, etc.)
-- Škoda (Enyaq, Superb iV, etc.)
-- Audi (e-tron, Q4 e-tron, etc.)
-- Cupra
-- und weitere...
+```
+config_flow.py ──→ __init__.py ──→ coordinator.py ──→ api.py
+    ↓                  ↓
+websocket_client.py    entity_manager.py ←→ switch.py
+    ↓
+websocket_api.py (Custom Card API)
+```
 
 ---
 
 ## Installation
 
-### Voraussetzungen
+### Requirements
 
-- Home Assistant 2025.12 oder neuer (getestet mit 2025.12)
-- EVCC v0.210.2 oder neuer mit aktivierter REST API (getestet mit 0.210.2)
-- EVCC und Home Assistant im gleichen Netzwerk (oder erreichbar)
+- Home Assistant 2025.12.0 or later
+- EVCC 0.210.2 or later (WebSocket mode)
+- Python 3.11 or later
+- Network access to EVCC instance (local network recommended)
 
-### Installationsschritte
+### Installation Steps
 
-#### 1. Mit HACS (empfohlen) 🎉
+#### 1. With HACS (Recommended) 🎉
 
-1. Öffne HACS in Home Assistant
-2. Gehe zu "Integrationen"
-3. Klicke auf das Menü (oben rechts) → "Custom Repositories"
-4. Füge folgende URL ein: `https://github.com/diestrohs/ha-evcc-scheduler`
-5. Wähle **"Integration"** als Kategorie
-6. Klicke "Erstellen"
-7. Suche nach "EVCC Scheduler" und klicke "Installieren"
-8. **⚠️ Wichtig**: Home Assistant neu starten erforderlich!
+1. Open HACS in Home Assistant
+2. Go to "Integrations"
+3. Click the menu (top right) → "Custom Repositories"
+4. Enter URL: `https://github.com/diestrohs/ha-evcc-scheduler`
+5. Select **"Integration"** as category
+6. Click "Create"
+7. Search for "EVCC Scheduler" and click "Install"
+8. **⚠️ Important**: Home Assistant restart required!
 
-#### 2. Manuell (ohne HACS)
+#### 2. Manual (Without HACS)
 
 ```bash
 cd /config/custom_components
 git clone https://github.com/diestrohs/ha-evcc-scheduler.git
-# Home Assistant neu starten
+# Restart Home Assistant
 ```
 
-#### 3. Integration konfigurieren
+#### 3. Configure Integration
 
-Nach der Installation und dem Neustart von Home Assistant:
+After installation and Home Assistant restart:
 
-1. Gehe zu **Einstellungen** → **Geräte und Services** → **Integrationen**
-2. Klicke **"+ Integration erstellen"**
-3. Suche nach **"EVCC Scheduler"** und wähle aus
-4. Folge der Konfiguration:
-   - **Host**: IP oder Hostname von EVCC (z.B. `192.168.1.100`)
-   - **Port**: EVCC API Port (Default: `7070`)
-   - **Token**: Optional, falls EVCC Token-Auth hat
-   - **SSL**: An/Aus je nach EVCC-Setup
-   - **Timeout**: HTTP-Timeout in Sekunden (Default: `10`)
-   - **WebSocket-Modus**: An/Aus (Default: An - empfohlen)
-  - **Custom Card WebSocket API (experimentell/ungestet)**: Standardmäßig AUS; nur aktivieren, wenn die Custom Card WS-API benötigt wird
+1. Go to **Settings** → **Devices and Services** → **Integrations**
+2. Click **"+ Create Integration"**
+3. Search for **"EVCC Scheduler"** and select it
+4. Follow the configuration:
+   - **Host**: IP or hostname of EVCC (e.g., `192.168.1.100`)
+   - **Port**: EVCC API port (Default: `7070`)
+   - **Token**: Optional, if EVCC requires token auth
+   - **SSL**: Enable/disable based on EVCC setup
+   - **Timeout**: HTTP timeout in seconds (Default: `10`)
+   - **Communication Mode**: WebSocket (recommended) or Polling (Default: WebSocket)
+   - **Polling Interval**: Seconds between updates (Default: `30`; only active in Polling mode)
+   - **Custom Card WebSocket API (experimental/untested)**: Disabled by default; only enable if you need the Custom Card WS API
 
 #### 4. Optional: Logging aktivieren
 
@@ -153,7 +157,7 @@ __init__.py (async_setup_entry)
 - **Fehlerbehandlung**: `raise_for_status()` wirft Exceptions bei HTTP-Fehlern
 
 #### `coordinator.py` - Data Update Coordinator
-- **Aufgabe**: Zentrale Datenquelle, 30s Polling
+- **Aufgabe**: Zentrale Datenquelle, konfigurierbarer Polling-Intervall (Default: 30s)
 - **Fahrzeugauswahl**: Iteriert `state["loadpoints"][]`, sucht `vehicleName`
 - **Datenstruktur**:
   ```python
@@ -197,7 +201,6 @@ __init__.py (async_setup_entry)
 - **Services**:
   - `evcc_scheduler.set_repeating_plan`
   - `evcc_scheduler.del_repeating_plan`
-  - `evcc_scheduler.toggle_plan_active`
 - **Validierung**: Prüft Fahrzeug-ID, Verfügbarkeit, Plan-Index
 - **Fehlerbehandlung**: `ServiceValidationError` mit aussagekräftigen Meldungen
 
@@ -225,54 +228,17 @@ __init__.py (async_setup_entry)
 
 ## Services
 
-### `evcc_scheduler.set_repeating_plan`
+### Plan aktiv/inaktiv über `evcc_scheduler.set_repeating_plan`
 
-**Beschreibung**: Erstelle oder aktualisiere einen wiederkehrenden Ladeplan
+Setze das Feld `active` für bestehende Pläne (anstelle eines separaten Toggle-Services):
 
-**Parameter**:
-```yaml
-service: evcc_scheduler.set_repeating_plan
-data:
-  vehicle_id: "db:1"           # Fahrzeug-ID (erforderlich)
-  plan_index: 1                # Optional: 1-basiert, null = neuer Plan anhängen
-  time: "07:00"                # Startzeit (HH:MM)
-  weekdays: [1, 2, 3, 4, 5]    # Wochentage (1=Mo, 7=So)
-  soc: 80                       # Ladeziel in % (10-100)
-  active: true                  # Plan aktiv/inaktiv
-```
-
-**Pflicht-/Optionale Felder**:
-| Feld | Pflicht? | Hinweis |
-|------|----------|---------|
-| `vehicle_id` | Ja | EVCC Fahrzeug-ID (z.B. `db:1`) |
-| `plan_index` | Nein | 1-basiert; wenn weggelassen/0 → Plan wird angehängt |
-| `time` | Ja | HH:MM (24h) |
-| `weekdays` | Ja | Liste 1-7 (1=Mo … 7=So) |
-| `soc` | Ja | Ziel-SOC in % (10-100) |
-| `active` | Nein | true/false, Standard: true |
-
-**Fehlerbehandlung**:
-| Fehler | Meldung |
-|--------|---------|
-| Kein Fahrzeug gewählt | "Kein Fahrzeug in EVCC gewählt" |
-| Fahrzeug-ID falsch | "Die Fahrzeug-ID 'db:1' stimmt nicht mit der gewählten Fahrzeug-ID in EVCC 'db:2' überein" |
-| Fahrzeug nicht angelegt | "Das Fahrzeug 'db:99' ist in EVCC nicht angelegt. Verfügbare Fahrzeuge: db:1, db:2" |
-| Plan-Index ungültig | "Plan-Index 99 ungültig" |
-
-**Beispiele**:
-
-Neuen Plan erstellen:
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
-  time: "22:00"
-  weekdays: [1, 2, 3, 4, 5]
-  soc: 100
+  plan_index: 1
   active: true
 ```
-
-Existierenden Plan aktualisieren:
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
@@ -308,56 +274,6 @@ data:
   vehicle_id: "db:1"
   plan_index: 2
 ```
-
-### `evcc_scheduler.toggle_plan_active`
-
-**Beschreibung**: Schalte Plan aktiv/inaktiv oder toggle
-
-**Parameter**:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"        # Fahrzeug-ID (erforderlich)
-  plan_index: 1             # Plan-Index 1-basiert (erforderlich)
-  active: true              # Optional: true/false setzen, null = toggle
-```
-
-**Pflicht-/Optionale Felder**:
-| Feld | Pflicht? | Hinweis |
-|------|----------|---------|
-| `vehicle_id` | Ja | EVCC Fahrzeug-ID (z.B. `db:1`) |
-| `plan_index` | Ja | 1-basiert, muss existieren |
-| `active` | Nein | Wenn weggelassen → toggle; sonst true/false setzen |
-
-**Beispiele**:
-
-Plan aktivieren:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-  active: true
-```
-
-Plan deaktivieren:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-  active: false
-```
-
-Plan toggle:
-```yaml
-service: evcc_scheduler.toggle_plan_active
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-```
-
----
 
 ## Datenfluss
 
@@ -525,8 +441,10 @@ DEFAULT_TIMEOUT = 10
 CONF_TIMEOUT = "timeout"
 CONF_SSL = "ssl"
 CONF_MODE = "mode"
+CONF_POLL_INTERVAL = "poll_interval"
 MODE_WEBSOCKET = "websocket"
 MODE_POLLING = "polling"
+DEFAULT_POLL_INTERVAL = 30
 ```
 
 ---

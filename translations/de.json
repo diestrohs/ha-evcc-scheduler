@@ -5,12 +5,14 @@
         "title": "EVCC Scheduler",
         "description": "Konfiguriere deine EVCC Scheduler Integration",
         "data": {
+          "name": "Name (optional)",
           "host": "Host",
           "port": "Port",
           "token": "Authentifizierungstoken (optional)",
-          "ssl": "SSL verwenden",
-          "timeout": "Timeout (Sekunden)",
-          "mode": "Kommunikationsmodus"
+          "ssl": "SSL-gesicherte Verbindung (https://)",
+          "websocket": "Websocket verwenden - Aktualisierungsintervall wird ignoriert",
+          "poll_interval": "Aktualisierungsintervall (Sekunden)",
+          "websocket_api": "Websocket API - Schnittstelle für eine spezifische Lovelace Card"
         }
       }
     },
@@ -25,12 +27,15 @@
         "title": "EVCC Scheduler Optionen",
         "description": "Aktualisiere die EVCC Scheduler Einstellungen",
         "data": {
+          "name": "Name (optional)",
           "host": "Host",
           "port": "Port",
           "token": "Authentifizierungstoken (optional)",
           "ssl": "SSL verwenden",
-          "timeout": "Timeout (Sekunden)",
-          "mode": "Kommunikationsmodus"
+
+          "websocket": "Websocket verwenden - Aktualisierungsintervall wird ignoriert",
+          "poll_interval": "Aktualisierungsintervall (Sekunden)",
+          "websocket_api": "Websocket API - Schnittstelle für eine spezifische Lovelace Card"
         }
       }
     }
@@ -46,7 +51,7 @@
         },
         "plan_index": {
           "name": "Plan-Index",
-          "description": "Der Index des zu ändernden Plans (0-basiert). Weglassen zum Erstellen eines neuen Plans."
+          "description": "Der Index des zu ändernden Plans (1-basiert, beginnt bei 1). Weglassen zum Erstellen eines neuen Plans."
         },
         "time": {
           "name": "Uhrzeit",
@@ -76,25 +81,7 @@
         },
         "plan_index": {
           "name": "Plan-Index",
-          "description": "Der Index des zu löschenden Plans (0-basiert)"
-        }
-      }
-    },
-    "toggle_plan_active": {
-      "name": "Plan-Status umschalten",
-      "description": "Schalte den aktiven Status eines wiederholten Plans um.",
-      "fields": {
-        "vehicle_id": {
-          "name": "Fahrzeug-ID",
-          "description": "Die ID des Fahrzeugs (z.B. 'db:1')"
-        },
-        "plan_index": {
-          "name": "Plan-Index",
-          "description": "Der Index des umzuschaltenden Plans (0-basiert)"
-        },
-        "active": {
-          "name": "Aktiv",
-          "description": "Auf true/false setzen zum Ein-/Ausschalten, weglassen zum Umschalten"
+          "description": "Der Index des zu löschenden Plans (1-basiert, beginnt bei 1)"
         }
       }
     }

@@ -8,12 +8,12 @@ set_repeating_plan:
       selector:
         text:
     plan_index:
-      description: The index of the plan to modify (0-based). Omit to create a new plan.
-      example: 0
+      description: The index of the plan to modify (1-based, starting from 1). Omit to create a new plan.
+      example: 1
       required: false
       selector:
         number:
-          min: 0
+          min: 1
     time:
       description: The time to start charging (HH:MM format).
       example: "07:00"
@@ -51,9 +51,9 @@ del_repeating_plan:
       selector:
         text:
     plan_index:
-      description: The index of the plan to delete (0-based).
-      example: 0
+      description: The index of the plan to delete (1-based, starting from 1).
+      example: 1
       required: true
       selector:
         number:
-          min: 0
+          min: 1

@@ -33,19 +33,37 @@ Home Assistant integration for managing EV charging schedules via EVCC API.
    - Host: `192.168.1.100` (EVCC IP)
    - Port: `7070` (default)
    - Token: (if required)
-  - Custom Card WS API (experimental): enable if you need the card API (untested)
-5. Click **Submit** ✅
+   - Communication Mode: WebSocket or Polling (default: WebSocket)
+   - Polling Interval: seconds (default: 30, only used if Polling mode selected)
+- Entity IDs remain stable across vehicle changes - automations don't break!
 
-### Usage
+## HACS Status ✅
 
-- Switch entities appear as `switch.evcc_{vehicle}_repeating_plan_0{n}`
-- Toggle plans directly in Home Assistant UI
-- Use services to create/update/delete plans
+This integration is **fully HACS compatible**:
+
+- ✅ Custom Repository ready (install via HACS with custom repo URL)
+- ✅ manifest.json with all required fields
+- ✅ hacs.json configured correctly
+- 📋 GitHub Releases (optional, not required for HACS custom repo)
+- ℹ️ Home Assistant Brands (optional, only for HACS default store)
+
+**Installation via HACS Custom Repository:**
+```
+HACS → Integraciones → ⋮ Menú → Custom Repositories
+→ https://github.com/diestrohs/ha-evcc-scheduler
+→ Categoría: Integration
+→ EVCC Scheduler → Instalar
+```
+
+See [HACS Integration Guide](./HACS_INTEGRATION.md) for details.
 
 ## Documentation
 
 - 📖 [Full Documentation (English)](./DOCUMENTATION.md)
 - 📖 [Deutsche Dokumentation](./README_DE.md)
+- 📋 [HACS Integration Guide](./HACS_INTEGRATION.md)
+- 🏷️ [GitHub Releases & Versioning](./GITHUB_RELEASES.md)
+- ✅ [HACS Compatibility Checklist](./HACS_CHECKLIST.md)
 - 🚀 [HACS Installation Guide](./HACS_INSTALL.md)
 - 📝 [Changelog](./CHANGELOG.md)
 - 🤝 [Contributing](./CONTRIBUTING.md)
@@ -85,16 +103,16 @@ data:
   plan_index: 1
 ```
 
-### `evcc_scheduler.toggle_plan_active`
+### Toggle via `evcc_scheduler.set_repeating_plan`
 
-Toggle plan active status.
+Set `active` true/false on an existing plan:
 
 ```yaml
-service: evcc_scheduler.toggle_plan_active
+service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
   plan_index: 1
-  active: false
+  active: true
 ```
 
 ## Architecture
@@ -207,15 +225,15 @@ data:
   plan_index: 1
 ```
 
-#### `evcc_scheduler.toggle_plan_active`
-Schalte einen Plan aktiv/inaktiv
+#### Plan aktiv/inaktiv setzen
+Nutze `evcc_scheduler.set_repeating_plan` mit dem Feld `active`:
 
 ```yaml
-service: evcc_scheduler.toggle_plan_active
+service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
   plan_index: 1
-  active: true  # Optional: null = toggle
+  active: true
 ```
 
 ### Entities

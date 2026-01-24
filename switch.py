@@ -40,13 +40,24 @@ class EvccPlanSwitch(CoordinatorEntity, SwitchEntity):
         self.plan = plan
         self.vehicle_title = vehicle_title
 
-        unique_id = build_entity_id(vehicle_id, index, vehicle_title)
+        unique_id = build_entity_id("", index)
         self._attr_unique_id = unique_id
-        # Force predictable entity_id (object_id) while keeping a friendly name
         self._attr_suggested_object_id = unique_id
-        # Fallback: force entity_id for brand-new entities (registry overrides if already present)
         self.entity_id = f"switch.{unique_id}"
-        self._attr_name = f"{vehicle_title} repeating Plan {index:02d}"
+        
+        # Name basierend auf HA-Sprache setzen
+        language = coordinator.hass.config.language
+        if language == "de":
+            self._attr_name = f"EVCC wiederkehrender Plan {index}"
+        else:
+            self._attr_name = f"EVCC repeating plan {index}"
+
+    def update_data(self, vehicle_id: str, plan: dict, vehicle_title: str) -> None:
+        """Update entity data without recreating it (for vehicle changes)"""
+        self.vehicle_id = vehicle_id
+        self.plan = plan
+        self.vehicle_title = vehicle_title
+        self._attr_name = f"EVCC repeating Plan {self.index}"
 
     @property
     def is_on(self) -> bool:
@@ -54,7 +65,25 @@ class EvccPlanSwitch(CoordinatorEntity, SwitchEntity):
 
     @property
     def extra_state_attributes(self) -> dict:
-        return self.plan.copy()
+        # Reihenfolge wie in EVCC API Response: weekdays, time, tz, soc, precondition, active
+        attrs = {}
+        if "weekdays" in self.plan:
+            attrs["weekdays"] = self.plan["weekdays"]
+        if "time" in self.plan:
+            attrs["time"] = self.plan["time"]
+        if "tz" in self.plan:
+            attrs["tz"] = self.plan["tz"]
+        if "soc" in self.plan:
+            attrs["soc"] = self.plan["soc"]
+        if "precondition" in self.plan:
+            attrs["precondition"] = self.plan["precondition"]
+        if "active" in self.plan:
+            attrs["active"] = self.plan["active"]
+        
+        # Zusätzliche Infos am Ende
+        attrs["vehicle_title"] = self.vehicle_title
+        attrs["vehicle_id"] = self.vehicle_id
+        return attrs
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         await self._toggle_active(True)
@@ -63,36 +92,43 @@ class EvccPlanSwitch(CoordinatorEntity, SwitchEntity):
         await self._toggle_active(False)
 
     async def _toggle_active(self, active: bool) -> None:
-        """Toggle the plan active state and sync with EVCC API."""
+        """Toggle the plan active state and sync with EVCC API.
+        
+        WICHTIG: Lädt immer die aktuellen Pläne direkt von EVCC API,
+        um sicherzustellen, dass EVCC die einzige Wahrheitsquelle ist.
+        """
         try:
-            # Lade alle Pläne vom Fahrzeug aus dem Coordinator (nicht von der API!)
-            # Dies ist effizienter als einen zusätzlichen API-Call zu machen
-            coordinator_data = self.coordinator.data
-            if not coordinator_data or "vehicles" not in coordinator_data:
-                _LOGGER.error("No coordinator data available for vehicle %s", self.vehicle_id)
-                return
-            
-            vehicles = coordinator_data.get("vehicles", {})
-            if self.vehicle_id not in vehicles:
-                _LOGGER.error("Vehicle %s not found in coordinator data", self.vehicle_id)
-                return
-            
-            vehicle_data = vehicles[self.vehicle_id]
-            plans = vehicle_data.get("repeatingPlans", [])
+            # EVCC ist die einzige Wahrheitsquelle - hole aktuelle Pläne direkt von API
+            _LOGGER.debug("Fetching current plans from EVCC for vehicle %s", self.vehicle_id)
+            plans = await self.coordinator.api.get_repeating_plans(self.vehicle_id)
 
             # Aktualisiere nur diesen Plan
             if self.index - 1 < len(plans):
+                old_state = plans[self.index - 1].get("active", False)
                 plans[self.index - 1]["active"] = active
-                _LOGGER.info("Toggling plan %d for vehicle '%s' to %s", self.index, self.vehicle_id, active)
+                _LOGGER.info("Toggling plan %d for vehicle '%s': %s → %s", 
+                           self.index, self.vehicle_id, old_state, active)
             else:
-                _LOGGER.error("Plan index %d for vehicle %s out of range", self.index, self.vehicle_id)
+                _LOGGER.error("Plan index %d for vehicle %s out of range (has %d plans)", 
+                            self.index, self.vehicle_id, len(plans))
                 return
 
             # Schreibe alle Pläne zurück zur API
             await self.coordinator.api.set_repeating_plans(self.vehicle_id, plans)
 
-            # Refresh Coordinator → alle Entities updaten
-            await self.coordinator.async_request_refresh()
+            # Sofort die neuen Daten in den Coordinator schreiben (nicht blockierend)
+            # Das gibt schnelles UI-Feedback, während der Refresh im Hintergrund läuft
+            updated_data = self.coordinator.data or {}
+            updated_vehicles = updated_data.get("vehicles", {}).copy()
+            updated_vehicles[self.vehicle_id] = {
+                "title": updated_vehicles.get(self.vehicle_id, {}).get("title", self.vehicle_id),
+                "repeatingPlans": plans
+            }
+            self.coordinator.async_set_updated_data({"vehicles": updated_vehicles, "id_map": self.coordinator.id_map})
+            _LOGGER.debug("Updated coordinator data immediately for toggle")
+            
+            # Trigger Refresh im Hintergrund (non-blocking) zur finalen Synchronisation
+            self.coordinator.async_request_refresh()
         except Exception as err:
             _LOGGER.error("Error toggling plan %d for vehicle %s: %s", self.index, self.vehicle_id, err)
             raise

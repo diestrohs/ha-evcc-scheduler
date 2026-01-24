@@ -53,25 +53,37 @@ class EvccWebsocketClient:
                 await asyncio.sleep(5)
     
     def _is_relevant_update(self, data: dict) -> bool:
-        """Prüfe ob die WS-Nachricht für den Scheduler relevant ist."""
+        """Prüfe ob die WS-Nachricht für den Scheduler relevant ist.
+        
+        Filtert nur KRITISCHE Updates heraus, um unnötige Coordinator-Refreshes zu vermeiden.
+        Ignoriert General-Updates (wie Fehler, Netzwerk-Status, etc.).
+        """
         if not isinstance(data, dict):
             return False
         
-        # EVCC sendet Updates mit verschiedenen Strukturen
-        # Relevante Events: vehicle changes, plan changes, active vehicle changes
-        
-        # Bei vollständigem State-Update (enthält "vehicles")
-        if "vehicles" in data:
+        # KRITISCH: Vollständiges State-Update (enthält vehicles + loadpoints)
+        # Dies ist selten, aber wenn EVCC neuen Gesamtstate sendet, müssen wir updaten
+        if "vehicles" in data and "loadpoints" in data:
+            _LOGGER.debug("Full state update detected from WS")
             return True
         
-        # Bei Event-basiertem Update
-        event_type = data.get("event") or data.get("type")
-        if event_type in ("vehicle", "plan", "activeVehicle", "state"):
-            return True
-        
-        # Bei Path-Updates (EVCC nutzt manchmal path-basierte Updates)
+        # KRITISCH: Vehicle/Plan-spezifische Updates (path-basiert)
         path = data.get("path", "")
-        if "vehicle" in path or "plan" in path or "active" in path.lower():
+        
+        # Plan-Änderungen sind DRINGEND
+        if "repeatingPlans" in path:
+            _LOGGER.debug("Plan change detected in WS path: %s", path)
             return True
         
+        # Vehicle-Name/Title-Änderungen sind WICHTIG (Fahrzeugwechsel)
+        if "/vehicles/" in path and ("title" in path or "name" in path):
+            _LOGGER.debug("Vehicle name/title change detected: %s", path)
+            return True
+        
+        # Aktives Fahrzeug in Ladestation geändert
+        if "vehicleName" in path or "activeVehicle" in path:
+            _LOGGER.debug("Active vehicle changed: %s", path)
+            return True
+        
+        # Alles andere ignorieren (Status-Updates, Netzwerk-Infos, etc.)
         return False

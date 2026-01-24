@@ -31,17 +31,23 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
 2. Klicke **+ Integration erstellen**
 3. Suche "EVCC Scheduler"
 4. Gib ein:
-   - Host: `192.168.1.100` (EVCC IP)
-   - Port: `7070` (Standard)
-   - Token: (falls erforderlich)
-  - Custom Card WS API (experimentell): aktivieren, wenn die Card-API benötigt wird (noch ungetestet)
+   - **Name** (optional): Benutzerdefinierter Name für diese Integration
+   - **Host**: `192.168.1.100` (EVCC IP-Adresse)
+   - **Port**: `7070` (Standard)
+   - **Token**: (falls Authentifizierung erforderlich)
+   - **SSL**: Aktivieren für HTTPS-Verbindungen
+   - **Websocket**: Aktivieren für Echtzeit-Updates (deaktiviert Polling)
+   - **Aktualisierungsintervall**: Sekunden (Standard: 30, nur wenn Websocket deaktiviert)
+   - **Websocket API**: Für Custom Lovelace Card Integration
 5. Klicke **Absenden** ✅
 
 ### Verwendung
 
-- Switch-Entities erscheinen als `switch.evcc_{fahrzeug}_repeating_plan_0{n}`
+- Switch-Entities erscheinen als `switch.evcc_repeating_plan_01`, `switch.evcc_repeating_plan_02`, etc. (fahrzeugagnostisch)
 - Schalte Pläne direkt in der Home Assistant UI
-- Nutze Services zum Erstellen/Aktualisieren/Löschen von Plänen
+- Plan-Attribute enthalten `vehicle_title` und `vehicle_id` zur Verifizierung des aktuellen Fahrzeugs
+- Nutze Services zum Erstellen/Aktualisieren/Löschen von Plänen (Umschalten via `set_repeating_plan` + `active`-Feld)
+- Entity-IDs bleiben über Fahrzeugwechsel stabil - Automations brechen nicht!
 
 ## Dokumentation
 
@@ -86,16 +92,16 @@ data:
   plan_index: 1
 ```
 
-### `evcc_scheduler.toggle_plan_active`
+### Umschalten via `evcc_scheduler.set_repeating_plan`
 
-Schalte den aktiven Status eines Plans um.
+Setze `active` auf true/false für einen bestehenden Plan:
 
 ```yaml
-service: evcc_scheduler.toggle_plan_active
+service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
   plan_index: 1
-  active: false
+  active: true
 ```
 
 ## Architektur

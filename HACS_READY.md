@@ -69,20 +69,21 @@
 ### Services
 - [x] `evcc_scheduler.set_repeating_plan`
 - [x] `evcc_scheduler.del_repeating_plan`
-- [x] `evcc_scheduler.toggle_plan_active`
 - [x] Validierung mit `ServiceValidationError`
 - [x] Aussagekräftige Fehlermeldungen
 
 ### Entity Management
 - [x] Switch-Entities für Pläne
-- [x] Entity-ID Generierung mit `build_entity_id()`
-- [x] Entity Registry Cleanup
+- [x] Entity-ID Generierung: `evcc_repeating_plan_{index}` (fahrzeugagnostisch)
+- [x] Entity Registry Cleanup (lazy-load, nur beim Löschen)
+- [x] Automatische Updates via `update_data()` (kein Registry-Zugriff bei gleichbleibender Plan-Anzahl)
 - [x] Automatisches Löschen verwaister Entities
 
 ### Data Management
 - [x] DataUpdateCoordinator mit 30s Polling
 - [x] WebSocket-Echtzeit-Updates
-- [x] Fahrzeugwechsel-Logik
+- [x] Fahrzeugwechsel-Logik mit Entity-Wiederverwendung
+- [x] Vehicle-Info in Attributes: `vehicle_title`, `vehicle_id`
 - [x] Korrekte Index-Verwaltung (1-basiert UI, 0-basiert Array)
 
 ---
