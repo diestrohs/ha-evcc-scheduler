@@ -66,6 +66,29 @@ async def async_setup_entry(hass, entry):
     # Registriere Services
     await async_setup_services(hass)
     
+    # Registriere Shutdown-Handler für sauberes Cleanup
+    async def _async_shutdown(event):
+        """Cleanup bei Home Assistant Shutdown"""
+        _LOGGER.info("Home Assistant shutting down, cleaning up EVCC Scheduler")
+        from homeassistant.helpers.entity_registry import async_get
+        
+        entity_registry = async_get(hass)
+        entities_to_remove = [
+            entity_id
+            for entity_id, entity_entry in entity_registry.entities.items()
+            if entity_entry.config_entry_id == entry.entry_id
+        ]
+        
+        for entity_id in entities_to_remove:
+            entity_registry.async_remove(entity_id)
+        
+        if entities_to_remove:
+            _LOGGER.info("Removed %d entities from registry on shutdown", len(entities_to_remove))
+    
+    entry.async_on_unload(
+        hass.bus.async_listen_once("homeassistant_stop", _async_shutdown)
+    )
+    
     _LOGGER.info("EVCC Scheduler integration setup completed successfully")
 
     return True
