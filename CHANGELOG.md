@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Performance Improvements
 
+- Entity Manager: Lazy-load registry (only access on deletion)
+- Switch Entity: Efficient `update_data()` method for vehicle changes
+- No registry access when plan count unchanged (vehicle switching optimization)
+
+### ✨ Features
+
+- Configurable WebSocket vs. Polling mode
+- Configurable polling interval (default: 30s)
+- WebSocket API for custom Lovelace Card (experimental)
+- Vehicle metadata in switch attributes (`vehicle_title`, `vehicle_id`)
+
+### 📝 Documentation
+
+- Complete English documentation (DOCUMENTATION_EN.md)
+- Updated German documentation (DOCUMENTATION_DE.md)
+- HACS integration guide (HACS_INTEGRATION.md)
+- Contributor guidelines (CONTRIBUTING_EN.md)
+- Security policy (.github/SECURITY.md)
+- GitHub issue and PR templates
+
+### 🔧 Configuration
+
+- Replaced `CONF_MODE` with `CONF_WEBSOCKET` (boolean)
+- Replaced `CONF_TIMEOUT` with `CONF_POLL_INTERVAL`
+- WebSocket enabled by default, can be disabled in config
+- Polling interval configurable (30s default)
+
 #### WebSocket Direct Data Sync
 - **Smart WS Updates**: WebSocket events now sync directly with coordinator without extra API calls
   - Plan updates 50-75% faster (~50-100ms vs ~150-200ms)

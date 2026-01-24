@@ -32,13 +32,14 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
 3. Suche "EVCC Scheduler"
 4. Gib ein:
    - **Name** (optional): Benutzerdefinierter Name für diese Integration
-   - **Host**: `192.168.1.100` (EVCC IP-Adresse)
-   - **Port**: `7070` (Standard)
-   - **Token**: (falls Authentifizierung erforderlich)
-   - **SSL**: Aktivieren für HTTPS-Verbindungen
-   - **Websocket**: Aktivieren für Echtzeit-Updates (deaktiviert Polling)
-   - **Aktualisierungsintervall**: Sekunden (Standard: 30, nur wenn Websocket deaktiviert)
-   - **Websocket API**: Für Custom Lovelace Card Integration
+   - **Host**: EVCC IP-Adresse (z.B. `192.168.1.100`)
+   - **Port**: EVCC-Port (Standard: `7070`)
+   - **Token**: Authentifizierungstoken (optional)
+   - **SSL**: Für HTTPS-Verbindungen aktivieren (optional)
+   - **WebSocket**: Für Echtzeit-Updates aktivieren (empfohlen, Standard: aktiviert)
+   - **Aktualisierungsintervall**: Sekunden (Standard: `30`, nur wenn WebSocket deaktiviert)
+   - **WebSocket API**: Für Custom Lovelace Card Integration (experimentell, optional)
+5. Klicke **Speichern** ✅
 5. Klicke **Absenden** ✅
 
 ### Verwendung
@@ -68,40 +69,58 @@ Eine Home Assistant Custom Integration zur Verwaltung wiederkehrender EV-Ladepl�
 
 ### `evcc_scheduler.set_repeating_plan`
 
-Erstelle oder aktualisiere einen Ladeplan.
+Erstelle oder aktualisiere einen wiederkehrenden Ladeplan.
 
+**Parameter:**
+- `vehicle_id` (erforderlich): Fahrzeug-ID von EVCC (z.B. `db:1`)
+- `plan_index` (optional): Plan-Nummer (1-basiert). Weglassen = neuer Plan
+- `time` (optional): Startzeit im Format HH:MM (24h)
+- `weekdays` (optional): Wochentage [1=Mo, 2=Di, ..., 7=So]
+- `soc` (optional): Ladeziel (1-100%)
+- `active` (optional): Plan ist aktiv (true/false, Standard: true)
+
+**Neuen Plan erstellen:**
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
-  plan_index: 1
   time: "07:00"
   weekdays: [1, 2, 3, 4, 5]
   soc: 80
   active: true
 ```
 
+**Existierenden Plan aktualisieren:**
+```yaml
+service: evcc_scheduler.set_repeating_plan
+data:
+  vehicle_id: "db:1"
+  plan_index: 1
+  soc: 90
+```
+
+**Plan-Status umschalten:**
+```yaml
+service: evcc_scheduler.set_repeating_plan
+data:
+  vehicle_id: "db:1"
+  plan_index: 1
+  active: false
+```
+
 ### `evcc_scheduler.del_repeating_plan`
 
-Lösche einen Ladeplan.
+Lösche einen wiederkehrenden Ladeplan.
+
+**Parameter:**
+- `vehicle_id` (erforderlich): Fahrzeug-ID von EVCC (z.B. `db:1`)
+- `plan_index` (erforderlich): Plan-Nummer zum Löschen (1-basiert)
 
 ```yaml
 service: evcc_scheduler.del_repeating_plan
 data:
   vehicle_id: "db:1"
   plan_index: 1
-```
-
-### Umschalten via `evcc_scheduler.set_repeating_plan`
-
-Setze `active` auf true/false für einen bestehenden Plan:
-
-```yaml
-service: evcc_scheduler.set_repeating_plan
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-  active: true
 ```
 
 ## Architektur

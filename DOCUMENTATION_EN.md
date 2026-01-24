@@ -109,11 +109,11 @@ After installation and Home Assistant restart:
    - **Name** (optional): Custom name for this integration
    - **Host**: EVCC IP address (e.g., `192.168.1.100`)
    - **Port**: EVCC port (default: `7070`)
-   - **Token**: If EVCC requires authentication
-   - **SSL**: Enable for HTTPS connections
-   - **WebSocket**: Enable for real-time updates (polling will be ignored)
+   - **Token**: If EVCC requires authentication (optional)
+   - **SSL**: Enable for HTTPS connections (optional)
+   - **WebSocket**: Enable for real-time updates (recommended, default: enabled)
    - **Polling Interval**: Seconds (default: `30`, only when WebSocket disabled)
-   - **WebSocket API**: For custom Lovelace Card integration (experimental)
+   - **WebSocket API**: For custom Lovelace Card integration (experimental, optional)
 
 5. Click **Submit** ✅
 
@@ -195,12 +195,12 @@ data:
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `vehicle_id` | string | Vehicle ID from EVCC (e.g., `db:1`) |
-| `plan_index` | integer | Plan number to create/update (1-based) |
 
 **Parameters (Optional):**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
+| `plan_index` | integer | - | Plan number to create/update (1-based). Omit to create new plan |
 | `time` | string | - | Time in HH:MM format (24h) |
 | `weekdays` | array | - | Days: [1=Mon, 2=Tue, ..., 7=Sun] |
 | `soc` | integer | - | Target SOC: 1-100 (%) |

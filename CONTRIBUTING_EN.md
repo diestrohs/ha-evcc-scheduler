@@ -93,6 +93,7 @@ pip install -e .
 - **Type Hints**: Required for all functions
 - **Imports**: Standard → Third-party → Home Assistant → Local
 - **Logging**: Use `_LOGGER` with appropriate levels (debug, info, warning, error)
+- **Indexing**: Plan indexing is 1-based for UI/services, 0-based for internal arrays
 
 ### Linting
 

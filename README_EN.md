@@ -33,7 +33,9 @@ Home Assistant integration for managing EV charging schedules via EVCC API.
    - Host: `192.168.1.100` (EVCC IP)
    - Port: `7070` (default)
    - Token: (if required)
-  - Custom Card WS API (experimental): enable if you need the card API (untested)
+   - SSL: Enable for HTTPS
+   - WebSocket: Enable for real-time updates (default: enabled)
+   - Polling Interval: seconds (default: 30, only if WebSocket disabled)
 5. Click **Submit** ✅
 
 ### Usage
@@ -63,40 +65,58 @@ Home Assistant integration for managing EV charging schedules via EVCC API.
 
 ### `evcc_scheduler.set_repeating_plan`
 
-Create or update charging plan.
+Create or update a repeating charging plan.
 
+**Parameters:**
+- `vehicle_id` (required): Vehicle ID from EVCC (e.g., `db:1`)
+- `plan_index` (optional): Plan number (1-based). Omit to create new plan
+- `time` (optional): Start time in HH:MM format (24h)
+- `weekdays` (optional): Weekdays [1=Mon, 2=Tue, ..., 7=Sun]
+- `soc` (optional): Target state of charge (1-100%)
+- `active` (optional): Plan is active (true/false, default: true)
+
+**Create new plan:**
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
-  plan_index: 1
   time: "07:00"
   weekdays: [1, 2, 3, 4, 5]
   soc: 80
   active: true
 ```
 
+**Update existing plan:**
+```yaml
+service: evcc_scheduler.set_repeating_plan
+data:
+  vehicle_id: "db:1"
+  plan_index: 1
+  soc: 90
+```
+
+**Toggle plan active status:**
+```yaml
+service: evcc_scheduler.set_repeating_plan
+data:
+  vehicle_id: "db:1"
+  plan_index: 1
+  active: false
+```
+
 ### `evcc_scheduler.del_repeating_plan`
 
-Delete charging plan.
+Delete a repeating charging plan.
+
+**Parameters:**
+- `vehicle_id` (required): Vehicle ID from EVCC (e.g., `db:1`)
+- `plan_index` (required): Plan number to delete (1-based)
 
 ```yaml
 service: evcc_scheduler.del_repeating_plan
 data:
   vehicle_id: "db:1"
   plan_index: 1
-```
-
-### Toggle via `evcc_scheduler.set_repeating_plan`
-
-Set `active` true/false on an existing plan:
-
-```yaml
-service: evcc_scheduler.set_repeating_plan
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-  active: true
 ```
 
 ## Architecture

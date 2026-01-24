@@ -30,12 +30,16 @@ Home Assistant integration for managing EV charging schedules via EVCC API.
 2. Click **+ Create Integration**
 3. Search "EVCC Scheduler"
 4. Enter:
-   - Host: `192.168.1.100` (EVCC IP)
-   - Port: `7070` (default)
-   - Token: (if required)
-   - Communication Mode: WebSocket or Polling (default: WebSocket)
-   - Polling Interval: seconds (default: 30, only used if Polling mode selected)
-- Entity IDs remain stable across vehicle changes - automations don't break!
+   - **Host**: EVCC IP address (e.g., `192.168.1.100`)
+   - **Port**: EVCC port (default: `7070`)
+   - **Token**: If EVCC requires authentication (optional)
+   - **SSL**: Enable for HTTPS connections (optional)
+   - **WebSocket**: Enable for real-time updates (recommended, default: enabled)
+   - **Polling Interval**: Seconds (default: `30`, only used if WebSocket disabled)
+   - **WebSocket API**: For custom Lovelace Card integration (experimental, optional)
+5. Click **Submit** ✅
+
+**Note**: Entity IDs remain stable across vehicle changes - automations don't break!
 
 ## HACS Status ✅
 
@@ -79,40 +83,58 @@ See [HACS Integration Guide](./HACS_INTEGRATION.md) for details.
 
 ### `evcc_scheduler.set_repeating_plan`
 
-Create or update charging plan.
+Create or update a repeating charging plan.
 
+**Parameters:**
+- `vehicle_id` (required): Vehicle ID from EVCC (e.g., `db:1`)
+- `plan_index` (optional): Plan number (1-based). Omit to create new plan
+- `time` (optional): Start time in HH:MM format (24h)
+- `weekdays` (optional): Weekdays [1=Mon, 2=Tue, ..., 7=Sun]
+- `soc` (optional): Target state of charge (1-100%)
+- `active` (optional): Plan is active (true/false, default: true)
+
+**Create new plan:**
 ```yaml
 service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
-  plan_index: 1
   time: "07:00"
   weekdays: [1, 2, 3, 4, 5]
   soc: 80
   active: true
 ```
 
+**Update existing plan:**
+```yaml
+service: evcc_scheduler.set_repeating_plan
+data:
+  vehicle_id: "db:1"
+  plan_index: 1
+  soc: 90
+```
+
+**Toggle plan active status:**
+```yaml
+service: evcc_scheduler.set_repeating_plan
+data:
+  vehicle_id: "db:1"
+  plan_index: 1
+  active: false
+```
+
 ### `evcc_scheduler.del_repeating_plan`
 
-Delete charging plan.
+Delete a repeating charging plan.
+
+**Parameters:**
+- `vehicle_id` (required): Vehicle ID from EVCC (e.g., `db:1`)
+- `plan_index` (required): Plan number to delete (1-based)
 
 ```yaml
 service: evcc_scheduler.del_repeating_plan
 data:
   vehicle_id: "db:1"
   plan_index: 1
-```
-
-### Toggle via `evcc_scheduler.set_repeating_plan`
-
-Set `active` true/false on an existing plan:
-
-```yaml
-service: evcc_scheduler.set_repeating_plan
-data:
-  vehicle_id: "db:1"
-  plan_index: 1
-  active: true
 ```
 
 ## Architecture

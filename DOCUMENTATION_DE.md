@@ -31,7 +31,11 @@ Einstellungen → Geräte und Services → + Integration erstellen
 → Suche: EVCC Scheduler
 → Host: 192.168.1.100 (EVCC-IP)
 → Port: 7070 (Standard)
-→ Bestätigen ✅
+→ Token: (falls erforderlich)
+→ SSL: (für HTTPS, optional)
+→ WebSocket: Aktiviert (empfohlen, Standard)
+→ Aktualisierungsintervall: 30 Sekunden (nur wenn WebSocket deaktiviert)
+→ Speichern ✅
 ```
 
 ### 3. Fertig! 🎉
