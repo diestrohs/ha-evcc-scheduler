@@ -8,26 +8,32 @@ set_repeating_plan:
       selector:
         text:
     plan_index:
-      description: The index of the plan to modify (1-based, starting from 1). Omit to create a new plan.
+      description: The index of the plan to modify (1-based, starting from 1). Omit to create a new plan (then time, tz, weekdays, soc, active are required).
       example: 1
       required: false
       selector:
         number:
           min: 1
     time:
-      description: The time to start charging (HH:MM format).
+      description: The time to start charging (HH:MM format). Required when creating a new plan (plan_index omitted).
       example: "07:00"
       required: false
       selector:
         text:
+    tz:
+      description: IANA timezone name for the plan time (e.g., "Europe/Berlin"). Required when creating a new plan (plan_index omitted); otherwise optional.
+      example: "Europe/Berlin"
+      required: false
+      selector:
+        text:
     weekdays:
-      description: List of weekdays (1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday).
+      description: List of weekdays (1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday). Required when creating a new plan (plan_index omitted).
       example: [1, 2, 3, 4, 5]
       required: false
       selector:
         object:
     soc:
-      description: State of charge target percentage (0-100).
+      description: State of charge target percentage (0-100). Required when creating a new plan (plan_index omitted).
       example: 80
       required: false
       selector:
@@ -35,7 +41,7 @@ set_repeating_plan:
           min: 0
           max: 100
     active:
-      description: Whether the plan is active.
+      description: Whether the plan is active. Required when creating a new plan (plan_index omitted).
       example: true
       required: false
       selector:

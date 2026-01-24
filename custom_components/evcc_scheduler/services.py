@@ -41,8 +41,21 @@ async def async_setup_services(hass: HomeAssistant):
             if key in call.data:
                 new_plan[key] = call.data[key]
 
+        if "tz" in call.data:
+            tz_val = call.data["tz"]
+            if not isinstance(tz_val, str) or not tz_val:
+                raise ServiceValidationError("'tz' muss eine IANA-Zeitzone sein, z.B. 'Europe/Berlin'")
+            new_plan["tz"] = tz_val
+
         if plan_index is None:
-            # Neuen Plan anhängen
+            # Neuer Plan: Pflichtfelder prüfen
+            required_fields = ["time", "tz", "weekdays", "soc", "active"]
+            missing = [f for f in required_fields if f not in new_plan]
+            if missing:
+                raise ServiceValidationError(
+                    "Fehlende Pflichtfelder für neuen Plan: " + ", ".join(missing)
+                )
+
             plans.append(new_plan)
             _LOGGER.info("Added new plan for vehicle %s", vehicle_id)
         else:

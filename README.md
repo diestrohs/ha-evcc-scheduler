@@ -2,6 +2,9 @@
 
 Home Assistant integration for managing EV charging schedules via EVCC API.
 
+**Repository Topics**: `homeassistant`, `integration`, `evcc`, `ev-charging`, `hacs`  
+**Description**: Home Assistant integration for managing EV charging schedules via EVCC API
+
 ## Features
 
 - 🚗 **Automatic Vehicle Detection**: Syncs with selected vehicle in EVCC
