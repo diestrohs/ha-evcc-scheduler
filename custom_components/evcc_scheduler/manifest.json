@@ -4,9 +4,9 @@
   "codeowners": ["@diestrohs"],
   "config_flow": true,
   "documentation": "https://github.com/diestrohs/ha-evcc-scheduler",
+  "integration_type": "service",
+  "iot_class": "local_polling",
   "issue_tracker": "https://github.com/diestrohs/ha-evcc-scheduler/issues",
   "requirements": ["aiohttp>=3.8.0"],
-  "version": "0.1.1",
-  "iot_class": "local_polling",
-  "integration_type": "service"
+  "version": "0.1.1"
 }
