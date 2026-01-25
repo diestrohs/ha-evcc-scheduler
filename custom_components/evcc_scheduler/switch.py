@@ -24,7 +24,7 @@ async def async_setup_entry(hass: Any, entry: Any, async_add_entities: Callable)
 
 
 class EvccPlanSwitch(BaseEvccPlanEntity, SwitchEntity):
-    _attr_translation_key = "repeating_plan_activ"
+    _attr_translation_key = "repeating_plan_active"
     
     def __init__(self, coordinator: DataUpdateCoordinator, vehicle_id: str, index: int, plan: dict, vehicle_title: str) -> None:
         super().__init__(coordinator, vehicle_id, index, plan, vehicle_title)

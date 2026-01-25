@@ -41,8 +41,8 @@
   },
   "entity": {
     "switch": {
-      "repeating_plan_activ": {
-        "name": "{vehicle_title} repeating plan {index} activ"
+      "repeating_plan_active": {
+        "name": "{vehicle_title} repeating plan {index} active"
       }
     },
     "time": {

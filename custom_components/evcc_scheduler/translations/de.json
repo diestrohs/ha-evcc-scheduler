@@ -42,7 +42,7 @@
   },
   "entity": {
     "switch": {
-      "repeating_plan_activ": {
+      "repeating_plan_active": {
         "name": "{vehicle_title} wiederkehrender Plan {index} aktiv"
       }
     },
