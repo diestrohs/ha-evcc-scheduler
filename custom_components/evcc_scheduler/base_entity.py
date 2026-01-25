@@ -42,3 +42,11 @@ class BaseEvccPlanEntity(CoordinatorEntity):
             "vehicle_title": self.vehicle_title,
             "plan_index": self.index,
         }
+
+    @property
+    def translation_placeholders(self) -> dict:
+        """Placeholders for translation_key rendering (vehicle title and plan index)."""
+        return {
+            "vehicle_title": self.vehicle_title,
+            "index": self.index,
+        }
