@@ -15,8 +15,8 @@ MAJOR.MINOR.PATCH
 ### Aktuelle Version
 
 ```
-0.1.2
-└─ First stable (0.x)
+0.1.4
+└─ Validation improvements & precondition enum
 ```
 
 ## Version Roadmap
@@ -31,6 +31,8 @@ MAJOR.MINOR.PATCH
 | 0.1.0 | ✅ Veröffentlicht | Stable Release, WS/Polling Konfiguration, WS API |
 | 0.1.1 | ✅ Veröffentlicht | Patch: Repo-Links/Codeowner auf diestrohs, Dokumentation aktualisiert |
 | 0.1.2 | ✅ Veröffentlicht | Patch: BaseEvccPlanEntity, Service-Optimierung, Icons, Dokumentation |
+| 0.1.3 | ✅ Veröffentlicht | Strikte Service-Validierung, robustere Fehlerbehandlung, Docs aktualisiert |
+| 0.1.4 | ✅ Veröffentlicht | Fix: `precondition` als Enum 0/1/2, Doku/Services angepasst |
 
 ## Release-Prozess
 
@@ -72,9 +74,9 @@ Vor jedem Release:
 **Via Git CLI**:
 
 ```bash
-git tag 0.1.2
-git push origin 0.1.2
-# Dann Release auf GitHub UI erstellen mit Notes
+git tag 0.1.4
+git push origin 0.1.4
+# Dann Release auf GitHub UI erstellen mit Notes (siehe RELEASE_NOTES_v0.1.4.md)
 ```
 
 ### 3. Release-Notes Vorlage
@@ -130,19 +132,19 @@ Thanks to:
 - Plus weitere...
 ```
 
-## Release-Notes für aktuelle Version (0.1.2)
+## Release-Notes für aktuelle Version (0.1.4)
 
 ```markdown
-## 🎉 Release 0.1.2
+## 🎉 Release 0.1.4
 
-**Highlights**: BaseEvccPlanEntity, vereinheitlichtes Plattform-Setup, Service-Optimierung (weniger API-Calls), Icons (Time/Number), SOC-Slider Schrittweite 10
+**Highlights**: `precondition` als Enum (0/1/2), klarere Service-Validierung
 
 ### What's new?
 
-#### 🛠️ Maintenance
-- Repo-Links und Issue-Tracker auf `diestrohs/ha-evcc-scheduler` korrigiert
-- Codeowner im manifest aktualisiert
-- Patch-Bump auf 0.1.2 (keine funktionalen Änderungen)
+#### 🛠️ Fixes
+- `precondition` akzeptiert ausschließlich 0, 1 oder 2 (statt bool)
+- Services-Validierung präzisiert, `services.yaml` Selector auf Zahlen 0–2
+- README & Dokumentation (DE/EN) angepasst
 
 ### 🔄 Dependencies
 
@@ -153,15 +155,12 @@ Thanks to:
 
 ### 🔄 Breaking Changes
 
-- Keine. Entity-IDs bleiben stabil (`evcc_repeating_plan_{index}`).
+- Keine. Entity-IDs bleiben stabil (`evcc_{fahrzeug}_repeating_plan_{index}_*`).
 
 ### 📝 Installation
 
 ```
-HACS → Integrationen → EVCC Scheduler
-→ Benutzerdefinierte Repositories
-→ https://github.com/yourusername/evcc_scheduler
-→ Installieren → Home Assistant neu starten
+HACS → Integrationen → EVCC Scheduler → Aktualisieren
 ```
 
 ### 📋 Checkliste nach Update
@@ -170,7 +169,6 @@ HACS → Integrationen → EVCC Scheduler
 - [ ] WebSocket-Updates werden empfangen (oder Polling-Fallback getestet)
 - [ ] Fahrzeugwechsel getestet (Entities bleiben stabil)
 - [ ] Services `set_repeating_plan` / `del_repeating_plan` funktionieren
-- [ ] Custom Card (falls genutzt) erhält `scheduler/*` Antworten
 
 ### 🙏 Credits
 
@@ -272,5 +270,5 @@ fi
 
 ---
 
-**Letzte Aktualisierung**: 24. Januar 2026  
-**Aktuelle Version**: 0.1.2
+**Letzte Aktualisierung**: 25. Januar 2026  
+**Aktuelle Version**: 0.1.4
