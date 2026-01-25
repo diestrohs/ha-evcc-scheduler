@@ -16,7 +16,7 @@ async def async_setup_entry(hass: Any, entry: Any, async_add_entities: Callable)
         hass,
         entry,
         async_add_entities,
-        suffix="_activ",
+        suffix="_active",
         entity_factory=lambda vehicle_id, idx, plan, title: EvccPlanSwitch(coordinator, vehicle_id, idx, plan, title),
         logger=_LOGGER,
         platform_name="switch",
@@ -28,7 +28,7 @@ class EvccPlanSwitch(BaseEvccPlanEntity, SwitchEntity):
     
     def __init__(self, coordinator: DataUpdateCoordinator, vehicle_id: str, index: int, plan: dict, vehicle_title: str) -> None:
         super().__init__(coordinator, vehicle_id, index, plan, vehicle_title)
-        unique_id = self.make_unique_id("_activ")
+        unique_id = self.make_unique_id("_active")
         self._attr_unique_id = unique_id
         self._attr_suggested_object_id = unique_id
         self._attr_name = f"{vehicle_title} wiederkehrender Plan {index} aktiv"

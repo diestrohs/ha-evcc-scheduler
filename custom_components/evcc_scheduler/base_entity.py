@@ -18,7 +18,7 @@ class BaseEvccPlanEntity(CoordinatorEntity):
         self.index = index
         self.plan = plan
         self.vehicle_title = vehicle_title
-        # Basis-ID mit _activ Suffix
+        # Basis-ID ohne Suffix; Plattformen hängen ihr Suffix an
         self._base_id = build_entity_id(vehicle_id, index, vehicle_title)
 
     def update_data(self, vehicle_id: str, plan: dict, vehicle_title: str) -> None:
@@ -30,9 +30,9 @@ class BaseEvccPlanEntity(CoordinatorEntity):
 
     def make_unique_id(self, suffix: str) -> str:
         """Erzeuge eindeutige ID basierend auf Basis-ID und Suffix."""
-        if not suffix or suffix == "_activ":
+        if not suffix:
             return self._base_id
-        return self._base_id.replace("_activ", suffix)
+        return f"{self._base_id}{suffix}"
 
     @property
     def extra_state_attributes(self) -> dict:

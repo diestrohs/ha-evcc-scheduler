@@ -32,11 +32,8 @@ class EvccEntityManager:
 
             for idx, plan in enumerate(plans, start=1):
                 base_id = build_entity_id(vehicle_id, idx, title)
-                # Suffix wird an base_id angehängt (ersetzt _activ wenn vorhanden)
-                if self.suffix:
-                    unique_id = base_id.replace("_activ", self.suffix)
-                else:
-                    unique_id = base_id
+                # Suffix wird direkt angehängt an base_id
+                unique_id = f"{base_id}{self.suffix}" if self.suffix else base_id
                 wanted_ids.add(unique_id)
 
                 if unique_id not in self.entities:
