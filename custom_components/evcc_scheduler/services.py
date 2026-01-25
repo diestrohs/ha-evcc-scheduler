@@ -8,6 +8,18 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_services(hass: HomeAssistant):
     """Registriere Services für Plan-Verwaltung"""
 
+    def _get_coordinator():
+        """Hole den aktiven Coordinator oder werfe eine saubere ValidationError."""
+        domain_data = hass.data.get(DOMAIN)
+        if not domain_data:
+            raise ServiceValidationError("Integration nicht initialisiert; bitte erneut laden.")
+
+        coordinator = next(iter(domain_data.values()), None)
+        if not coordinator:
+            raise ServiceValidationError("Kein aktiver Coordinator gefunden; bitte Integration neu laden.")
+
+        return coordinator
+
     async def _get_vehicles(coordinator) -> dict:
         """Hole Fahrzeuge-Daten aus EVCC-State (ein API-Call)."""
         evcc_state = await coordinator.api.get_state()
@@ -22,9 +34,82 @@ async def async_setup_services(hass: HomeAssistant):
                 f"Verfügbare Fahrzeuge: {available_vehicles}"
             )
 
+    def _parse_plan_index(raw_index, plans_len: int | None = None) -> int:
+        """Wandle 1-basierten Index in 0-basiert um und prüfe Reichweite."""
+        try:
+            idx_1_based = int(raw_index)
+        except (TypeError, ValueError):
+            raise ServiceValidationError("Plan-Index muss eine Ganzzahl sein") from None
+
+        if idx_1_based < 1:
+            raise ServiceValidationError("Plan-Index muss >= 1 sein")
+
+        if plans_len is not None and idx_1_based > plans_len:
+            raise ServiceValidationError(f"Plan-Index {idx_1_based} ungültig")
+
+        return idx_1_based - 1
+
+    def _validate_time(value: str) -> str:
+        if not isinstance(value, str):
+            raise ServiceValidationError("'time' muss ein String im Format HH:MM sein")
+        parts = value.split(":")
+        if len(parts) != 2:
+            raise ServiceValidationError("'time' muss im Format HH:MM vorliegen")
+        try:
+            hour = int(parts[0])
+            minute = int(parts[1])
+        except ValueError:
+            raise ServiceValidationError("'time' muss Zahlen im Format HH:MM enthalten") from None
+        if not (0 <= hour <= 23 and 0 <= minute <= 59):
+            raise ServiceValidationError("'time' muss eine gültige Uhrzeit (00:00-23:59) sein")
+        return f"{hour:02d}:{minute:02d}"
+
+    def _validate_weekdays(value) -> list[int]:
+        if not isinstance(value, (list, tuple)):
+            raise ServiceValidationError("'weekdays' muss eine Liste von Wochentagen (1-7) sein")
+        cleaned: list[int] = []
+        for day in value:
+            try:
+                day_int = int(day)
+            except (TypeError, ValueError):
+                raise ServiceValidationError("'weekdays' darf nur Zahlen enthalten") from None
+            if day_int < 1 or day_int > 7:
+                raise ServiceValidationError("'weekdays' Werte müssen zwischen 1 und 7 liegen")
+            cleaned.append(day_int)
+        if not cleaned:
+            raise ServiceValidationError("'weekdays' darf nicht leer sein")
+        return cleaned
+
+    def _validate_soc(value) -> int:
+        try:
+            soc_int = int(value)
+        except (TypeError, ValueError):
+            raise ServiceValidationError("'soc' muss eine Ganzzahl sein") from None
+        if soc_int < 0 or soc_int > 100:
+            raise ServiceValidationError("'soc' muss zwischen 0 und 100 liegen")
+        return soc_int
+
+    def _validate_active(value) -> bool:
+        if not isinstance(value, bool):
+            raise ServiceValidationError("'active' muss ein boolescher Wert sein")
+        return value
+
+    def _validate_precondition(value) -> int:
+        if value is None:
+            return 0
+        if isinstance(value, bool):
+            return int(value)
+        try:
+            precondition_int = int(value)
+        except (TypeError, ValueError):
+            raise ServiceValidationError("'precondition' muss bool oder 0/1 sein") from None
+        if precondition_int not in (0, 1):
+            raise ServiceValidationError("'precondition' muss 0 oder 1 sein")
+        return precondition_int
+
     async def set_repeating_plan(call: ServiceCall):
         """Erstelle oder aktualisiere einen Plan"""
-        coordinator = list(hass.data[DOMAIN].values())[0]
+        coordinator = _get_coordinator()
         vehicle_id = call.data["vehicle_id"]
         plan_index = call.data.get("plan_index")
 
@@ -37,9 +122,14 @@ async def async_setup_services(hass: HomeAssistant):
         plans = list(vehicle_data.get("repeatingPlans", []))
 
         new_plan = {}
-        for key in ["time", "weekdays", "soc", "active"]:
-            if key in call.data:
-                new_plan[key] = call.data[key]
+        if "time" in call.data:
+            new_plan["time"] = _validate_time(call.data["time"])
+        if "weekdays" in call.data:
+            new_plan["weekdays"] = _validate_weekdays(call.data["weekdays"])
+        if "soc" in call.data:
+            new_plan["soc"] = _validate_soc(call.data["soc"])
+        if "active" in call.data:
+            new_plan["active"] = _validate_active(call.data["active"])
 
         if "tz" in call.data:
             tz_val = call.data["tz"]
@@ -59,7 +149,7 @@ async def async_setup_services(hass: HomeAssistant):
                 )
 
         # Precondition mit Default 0
-        new_plan["precondition"] = call.data.get("precondition", 0)
+        new_plan["precondition"] = _validate_precondition(call.data.get("precondition", 0))
 
         if plan_index is None:
             # Neuer Plan: Pflichtfelder prüfen
@@ -74,12 +164,9 @@ async def async_setup_services(hass: HomeAssistant):
             _LOGGER.info("Added new plan for vehicle %s", vehicle_id)
         else:
             # Existierenden Plan aktualisieren (plan_index ist 1-basiert für UI)
-            idx = int(plan_index) - 1
-            if 0 <= idx < len(plans):
-                plans[idx] = {**plans[idx], **new_plan}
-                _LOGGER.info("Updated plan %d for vehicle %s", plan_index, vehicle_id)
-            else:
-                raise ServiceValidationError(f"Plan-Index {plan_index} ungültig")
+            idx = _parse_plan_index(plan_index, len(plans))
+            plans[idx] = {**plans[idx], **new_plan}
+            _LOGGER.info("Updated plan %d for vehicle %s", plan_index, vehicle_id)
 
         await coordinator.api.set_repeating_plans(vehicle_id, plans)
         await coordinator.async_request_refresh()
@@ -89,9 +176,8 @@ async def async_setup_services(hass: HomeAssistant):
 
     async def del_repeating_plan(call: ServiceCall):
         """Lösche einen Plan"""
-        coordinator = list(hass.data[DOMAIN].values())[0]
+        coordinator = _get_coordinator()
         vehicle_id = call.data["vehicle_id"]
-        plan_index = int(call.data["plan_index"]) - 1  # Konvertiere 1-basiert zu 0-basiert
 
         # Hole den aktuellen EVCC-State für Validierung
         all_vehicles = await _get_vehicles(coordinator)
@@ -100,11 +186,10 @@ async def async_setup_services(hass: HomeAssistant):
         # Hole die Pläne aus dem bereits geladenen State (vermeidet zweiten API-Call)
         vehicle_data = all_vehicles.get(vehicle_id, {})
         plans = list(vehicle_data.get("repeatingPlans", []))
-        if 0 <= plan_index < len(plans):
-            plans.pop(plan_index)
-            _LOGGER.info("Deleted plan %d for vehicle %s", plan_index + 1, vehicle_id)
-        else:
-            raise ServiceValidationError(f"Plan-Index {plan_index + 1} ungültig")
+        plan_index = _parse_plan_index(call.data.get("plan_index"), len(plans))
+
+        plans.pop(plan_index)
+        _LOGGER.info("Deleted plan %d for vehicle %s", plan_index + 1, vehicle_id)
 
         await coordinator.api.set_repeating_plans(vehicle_id, plans)
         await coordinator.async_request_refresh()

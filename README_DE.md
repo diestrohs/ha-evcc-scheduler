@@ -97,6 +97,8 @@ Erstelle oder aktualisiere einen wiederkehrenden Ladeplan.
 - `weekdays` (optional): Wochentage [1=Mo, 2=Di, 3=Mi, 4=Do, 5=Fr, 6=Sa, 7=So]
 - `soc` (optional): Ladeziel (1-100%)
 - `active` (optional): Plan ist aktiv (true/false, Standard: true)
+ - `tz` (optional): IANA-Zeitzone (Standard ist Home Assistant-Zeitzone)
+ - `precondition` (optional): bool oder 0/1 (Standard 0)
 
 **Neuen Plan erstellen:**
 ```yaml
@@ -104,6 +106,7 @@ service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
   time: "07:00"
+  tz: "Europe/Berlin"
   weekdays: [1, 2, 3, 4, 5]
   soc: 80
   active: true
@@ -141,6 +144,14 @@ data:
   vehicle_id: "db:1"
   plan_index: 1
 ```
+
+#### Eingabevalidierung
+
+- `time` muss `HH:MM` sein (00:00–23:59)
+- `weekdays` muss eine nicht-leere Liste aus Ganzzahlen 1–7 sein
+- `soc` muss eine Ganzzahl im Bereich 0–100 sein
+- `active` muss ein boolescher Wert sein
+- `precondition` muss bool oder 0/1 sein (wird normalisiert)
 
 ## Architektur
 
@@ -197,7 +208,7 @@ Siehe [CHANGELOG.md](./CHANGELOG.md) für Versionsverlauf.
 
 ---
 
-**Version**: 0.1.2  
+**Version**: 0.1.3  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **Lizenz**: MIT

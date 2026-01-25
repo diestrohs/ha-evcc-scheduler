@@ -1,3 +1,31 @@
+## [0.1.3] - 2026-01-25
+
+**Highlights**: Strengere Service-Validierung, robustere Fehlerbehandlung, Docs aktualisiert
+
+### ✨ Verbesserungen
+
+- Services prüfen Eingaben jetzt strikt und liefern klare Fehlermeldungen:
+  - `time`: validiert HH:MM (00:00–23:59)
+  - `weekdays`: Liste von Zahlen 1–7, nicht leer
+  - `soc`: Ganzzahl 0–100
+  - `active`: bool
+  - `precondition`: bool oder 0/1 (normiert auf 0/1)
+- Koordinator-Prüfung: Services brechen sauber ab, falls Integration nicht initialisiert
+
+### 📚 Dokumentation
+
+- README (DE/EN) um Abschnitt „Input Validation“ erweitert
+- Service-Beispiele ergänzt (optional `tz: Europe/Berlin`)
+
+### 🏷️ Versionierung & Release
+
+- manifest.json Version auf 0.1.3 angehoben
+- Changelog-Eintrag hinzugefügt
+
+### 🔒 Verhalten
+
+- Keine API-Änderungen; Entity-IDs und Datenfluss (Pull-Modify-Push-Refresh) bleiben unverändert
+
 ## [0.1.2] - 2026-01-24
 
 **Highlights**: BaseEvccPlanEntity, vereinheitlichtes Plattform-Setup, Service-Optimierung (weniger API-Calls), Icons (Time/Number), SOC-Slider Schrittweite 10

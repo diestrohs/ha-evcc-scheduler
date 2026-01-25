@@ -41,12 +41,11 @@ set_repeating_plan:
           min: 0
           max: 100
     precondition:
-      description: Precondition value (default 0).
-      example: 0
+      description: Precondition (boolean or 0/1; defaults to 0).
+      example: true
       required: false
       selector:
-        number:
-          min: 0
+        boolean:
     active:
       description: Whether the plan is active. Required when creating a new plan (plan_index omitted).
       example: true

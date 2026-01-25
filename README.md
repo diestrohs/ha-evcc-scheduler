@@ -95,6 +95,8 @@ Create or update a repeating charging plan.
 - `weekdays` (optional): Weekdays [1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat, 7=Sun]
 - `soc` (optional): Target state of charge (1-100%)
 - `active` (optional): Plan is active (true/false, default: true)
+ - `tz` (optional): IANA timezone (defaults to Home Assistant timezone)
+ - `precondition` (optional): boolean or 0/1 (defaults to 0)
 
 **Create new plan:**
 ```yaml
@@ -102,6 +104,7 @@ service: evcc_scheduler.set_repeating_plan
 data:
   vehicle_id: "db:1"
   time: "07:00"
+  tz: "Europe/Berlin"
   weekdays: [1, 2, 3, 4, 5]
   soc: 80
   active: true
@@ -139,6 +142,14 @@ data:
   vehicle_id: "db:1"
   plan_index: 1
 ```
+
+#### Input Validation
+
+- Time must be `HH:MM` (00:00–23:59)
+- Weekdays must be a non-empty list of integers 1–7
+- SOC must be an integer in range 0–100
+- Active must be boolean
+- Precondition must be boolean or 0/1 (normalized)
 
 ## Architecture
 
@@ -195,7 +206,7 @@ See [CHANGELOG.md](./CHANGELOG.md) for version history.
 
 ---
 
-**Version**: 0.1.2  
+**Version**: 0.1.3  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **License**: MIT
