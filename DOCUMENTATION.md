@@ -353,6 +353,10 @@ __init__.py (async_setup_entry)
   - `evcc_scheduler.del_repeating_plan`
 - **Validierung**: Prüft Fahrzeug-ID, Verfügbarkeit, Plan-Index
 - **Fehlerbehandlung**: `ServiceValidationError` mit aussagekräftigen Meldungen
+ - **Precondition**: Enum-Wert 0/1/2
+    - `0`: keine Vorbedingung
+    - `1`: nur bei PV-Überschuss
+    - `2`: nur bei günstigen Preisen (falls Tarife aktiv)
 
 #### `mapping.py` - Hilfsfunktionen
 - `extract_plans()`: Konvertiert EVCC-State zu vehicles-Dict

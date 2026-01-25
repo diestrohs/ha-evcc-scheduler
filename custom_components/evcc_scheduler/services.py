@@ -95,16 +95,18 @@ async def async_setup_services(hass: HomeAssistant):
         return value
 
     def _validate_precondition(value) -> int:
+        """Validiert Precondition als Enum: 0 (keine), 1 (PV-Überschuss), 2 (günstige Preise)."""
         if value is None:
             return 0
         if isinstance(value, bool):
-            return int(value)
+            # Boolean ist nicht erlaubt; klare Fehlermeldung, um Missverständnisse zu vermeiden
+            raise ServiceValidationError("'precondition' ist kein bool; erlaubt sind 0, 1, 2")
         try:
             precondition_int = int(value)
         except (TypeError, ValueError):
-            raise ServiceValidationError("'precondition' muss bool oder 0/1 sein") from None
-        if precondition_int not in (0, 1):
-            raise ServiceValidationError("'precondition' muss 0 oder 1 sein")
+            raise ServiceValidationError("'precondition' muss 0, 1 oder 2 sein") from None
+        if precondition_int not in (0, 1, 2):
+            raise ServiceValidationError("'precondition' muss 0, 1 oder 2 sein")
         return precondition_int
 
     async def set_repeating_plan(call: ServiceCall):

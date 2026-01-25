@@ -98,7 +98,7 @@ Erstelle oder aktualisiere einen wiederkehrenden Ladeplan.
 - `soc` (optional): Ladeziel (1-100%)
 - `active` (optional): Plan ist aktiv (true/false, Standard: true)
  - `tz` (optional): IANA-Zeitzone (Standard ist Home Assistant-Zeitzone)
- - `precondition` (optional): bool oder 0/1 (Standard 0)
+ - `precondition` (optional): Enum — 0=keine Vorbedingung, 1=nur PV-Überschuss, 2=nur günstige Preise (Standard 0)
 
 **Neuen Plan erstellen:**
 ```yaml
@@ -109,6 +109,7 @@ data:
   tz: "Europe/Berlin"
   weekdays: [1, 2, 3, 4, 5]
   soc: 80
+  precondition: 1
   active: true
 ```
 
@@ -151,7 +152,7 @@ data:
 - `weekdays` muss eine nicht-leere Liste aus Ganzzahlen 1–7 sein
 - `soc` muss eine Ganzzahl im Bereich 0–100 sein
 - `active` muss ein boolescher Wert sein
-- `precondition` muss bool oder 0/1 sein (wird normalisiert)
+- `precondition` muss 0, 1 oder 2 sein (Enum)
 
 ## Architektur
 
@@ -208,7 +209,7 @@ Siehe [CHANGELOG.md](./CHANGELOG.md) für Versionsverlauf.
 
 ---
 
-**Version**: 0.1.3  
+**Version**: 0.1.4  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **Lizenz**: MIT

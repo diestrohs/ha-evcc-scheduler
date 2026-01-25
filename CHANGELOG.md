@@ -1,4 +1,25 @@
 ## [0.1.3] - 2026-01-25
+## [0.1.4] - 2026-01-25
+
+**Fix**: Korrektur der `precondition`-Semantik auf Enum 0/1/2
+
+### 🔧 Änderungen
+
+- `precondition` akzeptiert jetzt ausschließlich 0, 1 oder 2:
+  - 0 = keine Vorbedingung
+  - 1 = nur PV-Überschuss
+  - 2 = nur günstige Preise (falls Tarife aktiv)
+- `services.yaml`: Selector auf Zahlenbereich 0–2 geändert, Beschreibung ergänzt
+- README (DE/EN) & Dokumentation (DE/EN) angepasst
+- Service-Validierung in `services.py` aktualisiert (Boolean explizit abgelehnt)
+
+### 🏷️ Versionierung & Release
+
+- manifest.json Version auf 0.1.4 angehoben
+
+### 🔒 Verhalten
+
+- Keine Änderung am Datenfluss, nur Validierung und Dokumentation präzisiert
 
 **Highlights**: Strengere Service-Validierung, robustere Fehlerbehandlung, Docs aktualisiert
 

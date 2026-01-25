@@ -96,7 +96,7 @@ Create or update a repeating charging plan.
 - `soc` (optional): Target state of charge (1-100%)
 - `active` (optional): Plan is active (true/false, default: true)
  - `tz` (optional): IANA timezone (defaults to Home Assistant timezone)
- - `precondition` (optional): boolean or 0/1 (defaults to 0)
+ - `precondition` (optional): Enum: 0=no precondition, 1=PV surplus only, 2=cheap prices only (defaults to 0)
 
 **Create new plan:**
 ```yaml
@@ -107,6 +107,7 @@ data:
   tz: "Europe/Berlin"
   weekdays: [1, 2, 3, 4, 5]
   soc: 80
+  precondition: 1
   active: true
 ```
 
@@ -149,7 +150,7 @@ data:
 - Weekdays must be a non-empty list of integers 1–7
 - SOC must be an integer in range 0–100
 - Active must be boolean
-- Precondition must be boolean or 0/1 (normalized)
+- Precondition must be 0, 1 or 2 (enum)
 
 ## Architecture
 
@@ -206,7 +207,7 @@ See [CHANGELOG.md](./CHANGELOG.md) for version history.
 
 ---
 
-**Version**: 0.1.3  
+**Version**: 0.1.4  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **License**: MIT

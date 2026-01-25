@@ -41,11 +41,13 @@ set_repeating_plan:
           min: 0
           max: 100
     precondition:
-      description: Precondition (boolean or 0/1; defaults to 0).
-      example: true
+      description: Precondition (0=no precondition, 1=PV surplus only, 2=cheap prices only).
+      example: 1
       required: false
       selector:
-        boolean:
+        number:
+          min: 0
+          max: 2
     active:
       description: Whether the plan is active. Required when creating a new plan (plan_index omitted).
       example: true
