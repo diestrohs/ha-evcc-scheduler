@@ -37,7 +37,7 @@ class EvccPlanSoc(BaseEvccPlanEntity, NumberEntity):
         unique_id = self.make_unique_id("_soc")
         self._attr_unique_id = unique_id
         self._attr_suggested_object_id = unique_id
-        self._attr_name = f"{vehicle_title} wiederkehrender Plan {index} Ladeziel"
+        self._attr_name = f"{vehicle_title} repeating plan {index} soc"
 
     # update_data geerbt von BaseEvccPlanEntity
 
