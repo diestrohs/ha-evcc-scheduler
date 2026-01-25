@@ -36,4 +36,4 @@ def build_entity_id(vehicle_id: str, index: int, title: str = None) -> str:
         .replace("-", "_")
         .replace(" ", "_")
     )
-    return f"evcc_{safe_name}_repeating_plan_{index}"
+    return f"evcc_{safe_name}_repeating_plan_{index:02d}"

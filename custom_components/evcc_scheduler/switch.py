@@ -31,6 +31,7 @@ class EvccPlanSwitch(BaseEvccPlanEntity, SwitchEntity):
         unique_id = self.make_unique_id("_active")
         self._attr_unique_id = unique_id
         self._attr_suggested_object_id = unique_id
+        self.entity_id = f"switch.{unique_id}"
 
     # update_data geerbt von BaseEvccPlanEntity
 

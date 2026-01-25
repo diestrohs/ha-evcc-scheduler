@@ -35,20 +35,6 @@ class BaseEvccPlanEntity(CoordinatorEntity):
         return f"{self._base_id}{suffix}"
 
     @property
-    def entity_id(self) -> str:
-        """Return the entity_id directly from unique_id to bypass HA auto-naming."""
-        if hasattr(self, '_attr_unique_id') and self._attr_unique_id:
-            # Extract platform prefix from entity class
-            platform = self.__class__.__module__.split('.')[-1]
-            return f"{platform}.{self._attr_unique_id}"
-        return None
-
-    @entity_id.setter
-    def entity_id(self, value: str) -> None:
-        """Allow HA to set entity_id during entity creation."""
-        pass
-
-    @property
     def extra_state_attributes(self) -> dict:
         """Gemeinsame Attribute für alle Entities."""
         return {

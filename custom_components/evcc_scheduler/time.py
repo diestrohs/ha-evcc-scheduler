@@ -33,6 +33,7 @@ class EvccPlanTime(BaseEvccPlanEntity, TimeEntity):
         unique_id = self.make_unique_id("_time")
         self._attr_unique_id = unique_id
         self._attr_suggested_object_id = unique_id
+        self.entity_id = f"time.{unique_id}"
 
     # update_data geerbt von BaseEvccPlanEntity
 
