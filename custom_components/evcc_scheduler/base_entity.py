@@ -10,7 +10,7 @@ class BaseEvccPlanEntity(CoordinatorEntity):
     """Basisklasse für EVCC-Plan-Entities mit gemeinsamen Feldern und Hilfsfunktionen."""
 
     _attr_should_poll = False
-    _attr_has_entity_name = True
+    _attr_has_entity_name = False
 
     def __init__(self, coordinator: DataUpdateCoordinator, vehicle_id: str, index: int, plan: dict, vehicle_title: str) -> None:
         super().__init__(coordinator)

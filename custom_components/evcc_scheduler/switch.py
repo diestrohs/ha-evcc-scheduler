@@ -31,7 +31,6 @@ class EvccPlanSwitch(BaseEvccPlanEntity, SwitchEntity):
         unique_id = self.make_unique_id("_active")
         self._attr_unique_id = unique_id
         self._attr_suggested_object_id = unique_id
-        self._attr_name = f"{vehicle_title} repeating plan {index} active"
 
     # update_data geerbt von BaseEvccPlanEntity
 
