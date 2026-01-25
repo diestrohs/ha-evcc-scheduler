@@ -28,9 +28,10 @@ def extract_plans(state: Dict) -> Dict:
 
 
 def build_entity_id(vehicle_id: str, index: int, title: str = None) -> str:
-    # Entity IDs stay stable across languages; always derive from vehicle_id
+    # Use title if available, otherwise fall back to vehicle_id
+    base = title if title else vehicle_id
     safe_name = (
-        vehicle_id.lower()
+        base.lower()
         .replace(":", "_")
         .replace("-", "_")
         .replace(" ", "_")
