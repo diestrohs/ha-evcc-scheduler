@@ -114,12 +114,5 @@
         }
       }
     }
-  },
-  "entity": {
-    "switch": {
-      "weekly_plan": {
-        "name": "EVCC repeating plan {index}"
-      }
-    }
   }
 }
