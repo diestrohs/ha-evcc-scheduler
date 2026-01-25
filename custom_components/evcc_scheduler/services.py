@@ -46,13 +46,24 @@ async def async_setup_services(hass: HomeAssistant):
             if not isinstance(tz_val, str) or not tz_val:
                 raise ServiceValidationError("'tz' muss eine IANA-Zeitzone sein, z.B. 'Europe/Berlin'")
             new_plan["tz"] = tz_val
+        else:
+            # Verwende Home Assistant Timezone als Default
+            ha_tz = hass.config.time_zone
+            if ha_tz:
+                new_plan["tz"] = ha_tz
+                _LOGGER.debug("Using HA timezone as default: %s", ha_tz)
+            else:
+                raise ServiceValidationError(
+                    "'tz' nicht angegeben und Home Assistant Zeitzone nicht konfiguriert. "
+                    "Bitte 'tz' angeben oder HA Zeitzone setzen."
+                )
 
         # Precondition mit Default 0
         new_plan["precondition"] = call.data.get("precondition", 0)
 
         if plan_index is None:
             # Neuer Plan: Pflichtfelder prüfen
-            required_fields = ["time", "tz", "weekdays", "soc", "active"]
+            required_fields = ["time", "weekdays", "soc", "active"]
             missing = [f for f in required_fields if f not in new_plan]
             if missing:
                 raise ServiceValidationError(

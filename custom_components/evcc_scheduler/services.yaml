@@ -21,7 +21,7 @@ set_repeating_plan:
       selector:
         text:
     tz:
-      description: IANA timezone name for the plan time (e.g., "Europe/Berlin"). Required when creating a new plan (plan_index omitted); otherwise optional.
+      description: IANA timezone name for the plan time (e.g., "Europe/Berlin"). Optional; defaults to Home Assistant timezone if omitted.
       example: "Europe/Berlin"
       required: false
       selector:
