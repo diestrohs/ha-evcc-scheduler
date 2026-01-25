@@ -78,6 +78,10 @@
           "name": "Time",
           "description": "The time to start charging (HH:MM format)"
         },
+        "tz": {
+          "name": "Timezone",
+          "description": "IANA timezone name for the plan time (e.g., 'Europe/Berlin'). Optional; defaults to Home Assistant timezone if omitted."
+        },
         "weekdays": {
           "name": "Weekdays",
           "description": "List of weekdays (1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday)"
@@ -85,6 +89,10 @@
         "soc": {
           "name": "State of Charge",
           "description": "State of charge target percentage (0-100)"
+        },
+        "precondition": {
+          "name": "Precondition",
+          "description": "Precondition for the plan (0=no precondition, 1=only with PV surplus, 2=only with cheap prices if tariffs active). Default: 0"
         },
         "active": {
           "name": "Active",

@@ -79,6 +79,10 @@
           "name": "Uhrzeit",
           "description": "Die Startzeit des Ladens (HH:MM Format)"
         },
+        "tz": {
+          "name": "Zeitzone",
+          "description": "IANA-Zeitzone für die Plan-Zeit (z.B. 'Europe/Berlin'). Optional; wird auf Home Assistant Zeitzone gesetzt, wenn nicht angegeben."
+        },
         "weekdays": {
           "name": "Wochentage",
           "description": "Liste der Wochentage (1=Montag, 2=Dienstag, 3=Mittwoch, 4=Donnerstag, 5=Freitag, 6=Samstag, 7=Sonntag)"
@@ -86,6 +90,10 @@
         "soc": {
           "name": "Ladezustand",
           "description": "Ziel-Ladezustand in Prozent (0-100)"
+        },
+        "precondition": {
+          "name": "Vorbedingung",
+          "description": "Vorbedingung für den Plan (0=keine Vorbedingung, 1=nur bei PV-Überschuss, 2=nur bei günstigen Preisen falls Tarife aktiv). Standard: 0"
         },
         "active": {
           "name": "Aktiv",
