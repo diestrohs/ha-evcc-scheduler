@@ -1,5 +1,8 @@
 # HA EVCC Scheduler
 
+> **Repository Topics:** homeassistant, integration, evcc, ev-charging, hacs
+> **Description:** Home Assistant integration for managing EV charging schedules via EVCC API
+
 Home Assistant integration for managing EV charging schedules via EVCC API.
 
 **Repository Topics**: `homeassistant`, `integration`, `evcc`, `ev-charging`, `hacs`  
