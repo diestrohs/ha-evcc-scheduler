@@ -1,7 +1,9 @@
 import logging
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
+
 from .const import DOMAIN
+from .mapping import weekdays_1to7_to_0to6, weekdays_0to6_to_1to7
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -78,7 +80,8 @@ async def async_setup_services(hass: HomeAssistant):
             cleaned.append(day_int)
         if not cleaned:
             raise ServiceValidationError("'weekdays' darf nicht leer sein")
-        return cleaned
+        # Mapping für EVCC: 7 (So) → 0
+        return weekdays_1to7_to_0to6(cleaned)
 
     def _validate_soc(value) -> int:
         try:
@@ -170,6 +173,10 @@ async def async_setup_services(hass: HomeAssistant):
             plans[idx] = {**plans[idx], **new_plan}
             _LOGGER.info("Updated plan %d for vehicle %s", plan_index, vehicle_id)
 
+        # Mapping zurück für API: 0=So, 1=Mo, ...
+        for plan in plans:
+            if "weekdays" in plan:
+                plan["weekdays"] = [int(d) for d in plan["weekdays"]]
         await coordinator.api.set_repeating_plans(vehicle_id, plans)
         await coordinator.async_request_refresh()
 

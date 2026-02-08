@@ -1,3 +1,10 @@
+def weekdays_1to7_to_0to6(weekdays: list[int]) -> list[int]:
+    """Mappt 1-7 (1=Mo, 7=So) auf 0-6 (0=So, 1=Mo, ..., 6=Sa) für EVCC API."""
+    return [0 if d == 7 else d for d in weekdays]
+
+def weekdays_0to6_to_1to7(weekdays: list[int]) -> list[int]:
+    """Mappt 0-6 (0=So, 1=Mo, ..., 6=Sa) auf 1-7 (1=Mo, ..., 7=So) für UI/HA."""
+    return [7 if d == 0 else d for d in weekdays]
 from typing import Dict, List, Optional
 
 def extract_plans(state: Dict) -> Dict:
