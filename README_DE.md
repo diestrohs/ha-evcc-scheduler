@@ -209,11 +209,14 @@ Siehe [CHANGELOG.md](./CHANGELOG.md) für Versionsverlauf.
 
 ---
 
-**Version**: 0.1.4  
+**Version**: 0.1.5  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **Lizenz**: MIT
 
-**Zuletzt aktualisiert**: 24. Januar 2026
+**Zuletzt aktualisiert**: 8. Februar 2026
+
+**Hinweis zum Wochentag-Mapping:**
+EVCC erwartet Sonntag als 0, die UI und Home Assistant als 7. Die Integration mappt 7↔0 automatisch für alle Planoperationen.
 
 [English](./README.md)

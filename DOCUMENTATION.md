@@ -9,6 +9,9 @@
 **HACS:** ✅ Compatible & Available  
 **Home Assistant:** 2025.12.0+  
 **EVCC:** 0.210.2+
+**Version:** 0.1.5
+# Weekday Mapping
+EVCC expects Sunday as 0, while Home Assistant and UI use 7. The integration automatically maps 7↔0 for all plan operations.
 
 ---
 

@@ -207,12 +207,15 @@ See [CHANGELOG.md](./CHANGELOG.md) for version history.
 
 ---
 
-**Version**: 0.1.4  
+**Version**: 0.1.5  
 **Home Assistant**: 2025.12.0+  
 **EVCC**: 0.210.2+  
 **License**: MIT
 
-**Last Updated**: January 24, 2026
+**Last Updated**: February 8, 2026
+
+**Weekday Mapping Note:**
+EVCC expects Sunday as 0, while Home Assistant and UI use 7. The integration automatically maps 7↔0 for all plan operations.
 
 [Deutsch / German](./README_DE.md)
 cd /config/custom_components
