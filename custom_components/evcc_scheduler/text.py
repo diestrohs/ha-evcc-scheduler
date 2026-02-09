@@ -37,43 +37,41 @@ class EvccPlanWeekdays(BaseEvccPlanEntity, TextEntity):
 
     @property
     def native_value(self) -> str:
-        weekdays = self.plan.get("weekdays", [])
-        if not weekdays:
+        from .mapping import weekdays_0to6_to_1to7
+        weekdays_evcc = self.plan.get("weekdays", [])
+        if not weekdays_evcc:
             return ""
-        # Konvertiere Liste zu kommagetrennt: [1, 2, 3] -> "1,2,3"
-        return ",".join(str(day) for day in weekdays)
+        weekdays_ui = weekdays_0to6_to_1to7(weekdays_evcc)
+        return ",".join(str(day) for day in weekdays_ui)
 
     async def async_set_value(self, value: str) -> None:
-        """Set new weekdays value"""
+        """Set new weekdays value (map 7→0 for EVCC)"""
         try:
-            # Konvertiere "1,2,3" -> [1, 2, 3]
-            weekdays = [int(day.strip()) for day in value.split(",") if day.strip()]
-            
-            # Validiere Werte (1-7)
-            if not all(1 <= day <= 7 for day in weekdays):
+            weekdays_ui = [int(day.strip()) for day in value.split(",") if day.strip()]
+            if not all(1 <= day <= 7 for day in weekdays_ui):
                 _LOGGER.error("Invalid weekdays: must be between 1 and 7")
                 return
-            
+            from .mapping import weekdays_1to7_to_0to6
+            weekdays_evcc = weekdays_1to7_to_0to6(weekdays_ui)
             coordinator_data = self.coordinator.data
             if not coordinator_data or "vehicles" not in coordinator_data:
                 _LOGGER.error("No coordinator data available")
                 return
-
             vehicles = coordinator_data.get("vehicles", {})
             if self.vehicle_id not in vehicles:
                 _LOGGER.error("Vehicle %s not found", self.vehicle_id)
                 return
-
             vehicle_data = vehicles[self.vehicle_id]
             plans = vehicle_data.get("repeatingPlans", [])
-
             if self.index - 1 < len(plans):
-                plans[self.index - 1]["weekdays"] = weekdays
-                _LOGGER.info("Setting weekdays for plan %d of vehicle '%s' to %s", self.index, self.vehicle_id, weekdays)
+                # Validierung vor dem API-Call
+                if not all(isinstance(d, int) and 0 <= d <= 6 for d in weekdays_evcc):
+                    _LOGGER.error("Invalid weekdays_evcc for API: %s (nur 0-6 erlaubt)", weekdays_evcc)
+                    return
+                plans[self.index - 1]["weekdays"] = weekdays_evcc
             else:
                 _LOGGER.error("Plan index %d out of range", self.index)
                 return
-
             await self.coordinator.api.set_repeating_plans(self.vehicle_id, plans)
             await self.coordinator.async_request_refresh()
         except ValueError as err:
@@ -85,6 +83,8 @@ class EvccPlanWeekdays(BaseEvccPlanEntity, TextEntity):
 
     @property
     def extra_state_attributes(self) -> dict:
+        from .mapping import weekdays_0to6_to_1to7
         attrs = super().extra_state_attributes
-        attrs["weekdays_list"] = self.plan.get("weekdays", [])
+        weekdays_evcc = self.plan.get("weekdays", [])
+        attrs["weekdays_list"] = weekdays_0to6_to_1to7(weekdays_evcc)
         return attrs
