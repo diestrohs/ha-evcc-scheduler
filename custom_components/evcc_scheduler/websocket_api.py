@@ -214,7 +214,7 @@ async def ws_set_scheduler(hass: HomeAssistant, connection, msg) -> None:
         connection.send_error(msg["id"], "failed", str(err))
 
 
-@websocket_api.websocket_command({"type": "scheduler/deleate", "plan_index": int})
+@websocket_api.websocket_command({"type": "scheduler/delete", "plan_index": int})
 @websocket_api.async_response
 async def ws_delete_scheduler(hass: HomeAssistant, connection, msg) -> None:
     """Lösche einen repeatingPlan (plan_index: 1-basiert)."""

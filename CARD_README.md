@@ -95,7 +95,7 @@ await hass.callWS({
 ### Plan löschen
 ```javascript
 await hass.callWS({
-  type: "scheduler/deleate",
+  type: "scheduler/delete",
   vehicle_id: "vehicle:123",
   plan_index: 1  // 1-basiert
 });

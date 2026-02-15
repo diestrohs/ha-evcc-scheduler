@@ -345,7 +345,7 @@ __init__.py (async_setup_entry)
 - **Commands**:
    - `type: "scheduler/get"`: Holt Fahrzeug + Pläne
    - `type: "scheduler/set"`: Plan anlegen oder bearbeiten
-   - `type: "scheduler/deleate"`: Plan löschen (Typo ist absichtlich für Kompatibilität)
+   - `type: "scheduler/delete"`: Plan löschen
 - **Broadcast**: Sendet `plans_updated` Event an alle WS-Clients
 
 #### `__init__.py` - Integration-Setup

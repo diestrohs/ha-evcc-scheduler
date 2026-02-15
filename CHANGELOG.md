@@ -271,7 +271,7 @@ Waiting for coordinator refresh to ensure data consistency
   - `scheduler/get`: Fetch current scheduler state
   - `scheduler/add`: Add new repeating plan
   - `scheduler/edit`: Modify existing plan
-  - `scheduler/deleate`: Delete plan (matches EVCC typo)
+  - `scheduler/delete`: Delete plan
 
 #### Configuration
 - **Config Flow**: User-friendly setup wizard
