@@ -3,18 +3,13 @@
 **Fix**: Weekday mapping for Sunday (7↔0) in both directions for EVCC API compatibility
 
 ### Änderungen
-- Automatisches Mapping von 7 (Sonntag, UI/HA) auf 0 (EVCC API) und zurück
 - Tests für Mapping hinzugefügt
 - Dokumentation und Release-Dateien aktualisiert
 - manifest.json Version auf 0.1.5 angehoben
 
-## [0.1.3] - 2026-01-25
 ## [0.1.4] - 2026-01-25
 
-**Fix**: Korrektur der `precondition`-Semantik auf Enum 0/1/2
-
-### 🔧 Änderungen
-
+ `ws_set_scheduler()`: Guarantees data consistency
 - `precondition` akzeptiert jetzt ausschließlich 0, 1 oder 2:
   - 0 = keine Vorbedingung
   - 1 = nur PV-Überschuss

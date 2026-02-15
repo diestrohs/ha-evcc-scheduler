@@ -343,10 +343,9 @@ __init__.py (async_setup_entry)
 #### `websocket_api.py` - WebSocket-API für Custom Card
 - **Aufgabe**: Ermöglicht Custom Lovelace Card, Daten zu holen
 - **Commands**:
-  - `type: "scheduler/get"`: Holt Fahrzeug + Pläne
-  - `type: "scheduler/add"`: Neuen Plan anlegen
-  - `type: "scheduler/edit"`: Plan bearbeiten
-  - `type: "scheduler/deleate"`: Plan löschen (Typo ist absichtlich für Kompatibilität)
+   - `type: "scheduler/get"`: Holt Fahrzeug + Pläne
+   - `type: "scheduler/set"`: Plan anlegen oder bearbeiten
+   - `type: "scheduler/deleate"`: Plan löschen (Typo ist absichtlich für Kompatibilität)
 - **Broadcast**: Sendet `plans_updated` Event an alle WS-Clients
 
 #### `__init__.py` - Integration-Setup

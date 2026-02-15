@@ -59,14 +59,13 @@
 - `ws_api.py`: 290 Zeilen (alt, dupliziert)
 
 **Funktionen in websocket_api.py:**
-- ✅ `EvccWebSocketAPI` class
-- ✅ `ws_get_scheduler` command
-- ✅ `ws_add_scheduler` command
-- ✅ `ws_edit_scheduler` command
-- ✅ `ws_delete_scheduler` command
-- ✅ `async_register_ws_commands` function
-- ✅ `_convert_weekdays_to_user` helper
-- ✅ `_convert_weekdays_to_api` helper
+✅ `EvccWebSocketAPI` class
+✅ `ws_get_scheduler` command
+✅ `ws_set_scheduler` command
+✅ `ws_delete_scheduler` command
+✅ `async_register_ws_commands` function
+✅ `_convert_weekdays_to_user` helper
+✅ `_convert_weekdays_to_api` helper
 
 ---
 

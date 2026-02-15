@@ -157,40 +157,47 @@ async def ws_get_scheduler(hass: HomeAssistant, connection, msg) -> None:
         connection.send_error(msg["id"], "failed", str(err))
 
 
-@websocket_api.websocket_command({"type": "scheduler/add"})
+
+@websocket_api.websocket_command({"type": "scheduler/set"})
 @websocket_api.async_response
-async def ws_add_scheduler(hass: HomeAssistant, connection, msg) -> None:
-    """Füge einen repeatingPlan hinzu (weekdays: 1=Montag, 7=Sonntag)."""
+async def ws_set_scheduler(hass: HomeAssistant, connection, msg) -> None:
+    """Erstelle oder bearbeite einen repeatingPlan (add: kein plan_index, edit: mit plan_index, weekdays: 1=Montag, 7=Sonntag)."""
     try:
         coordinator = _get_coordinator(hass)
         data = coordinator.data or {}
         vehicles = data.get("vehicles", {})
-        
-        # Hole die vehicle_id des aktuell geladenen Fahrzeugs
         if not vehicles:
             raise ValueError("Kein Fahrzeug geladen")
-        
-        vehicle_id = next(iter(vehicles.keys()))
+        vehicle_id = msg.get("vehicle_id") or next(iter(vehicles.keys()))
         plans = await coordinator.api.get_repeating_plans(vehicle_id)
 
+        plan_index = msg.get("plan_index")
         new_plan = {}
         for key in ("time", "soc", "active"):
             if key in msg:
                 new_plan[key] = msg[key]
-        # Konvertiere Wochentage: User 1-7 → EVCC 0-6
         if "weekdays" in msg:
             new_plan["weekdays"] = _convert_weekdays_to_api(msg["weekdays"])
 
-        plans.append(new_plan)
+        if plan_index is None:
+            # Add: Pflichtfelder prüfen
+            required_fields = ["time", "weekdays", "soc", "active"]
+            missing = [f for f in required_fields if f not in new_plan]
+            if missing:
+                raise ValueError("Fehlende Pflichtfelder für neuen Plan: " + ", ".join(missing))
+            plans.append(new_plan)
+        else:
+            idx = int(plan_index) - 1
+            if not (0 <= idx < len(plans)):
+                raise IndexError("plan_index out of range")
+            plans[idx] = {**plans[idx], **new_plan}
+
         await coordinator.api.set_repeating_plans(vehicle_id, plans)
 
-        # Konvertiere Pläne zurück zu User-Format für Response/Broadcast
         user_plans = [
             {**plan, "weekdays": _convert_weekdays_to_user(plan.get("weekdays"))}
             for plan in plans
         ]
-        
-        # Sofort Update (nicht blockierend)
         updated_data = coordinator.data or {}
         updated_vehicles = updated_data.get("vehicles", {}).copy()
         updated_vehicles[vehicle_id] = {
@@ -198,72 +205,10 @@ async def ws_add_scheduler(hass: HomeAssistant, connection, msg) -> None:
             "repeatingPlans": plans
         }
         coordinator.async_set_updated_data({"vehicles": updated_vehicles, "id_map": coordinator.id_map})
-        
-        # Trigger Refresh im Hintergrund
         coordinator.async_request_refresh()
-        
-        # Broadcast sofort nach lokaler Update
         api = hass.data.get("evcc_scheduler_ws_api")
         if api:
             api.broadcast({"type": "plans_updated", "vehicle_id": vehicle_id, "plans": user_plans})
-
-        connection.send_result(msg["id"], {"vehicle_id": vehicle_id, "plans": user_plans})
-    except Exception as err:
-        connection.send_error(msg["id"], "failed", str(err))
-
-
-@websocket_api.websocket_command({"type": "scheduler/edit", "plan_index": int})
-@websocket_api.async_response
-async def ws_edit_scheduler(hass: HomeAssistant, connection, msg) -> None:
-    """Bearbeite einen repeatingPlan (plan_index: 1-basiert, weekdays: 1=Montag, 7=Sonntag)."""
-    try:
-        coordinator = _get_coordinator(hass)
-        data = coordinator.data or {}
-        vehicles = data.get("vehicles", {})
-        
-        # Hole die vehicle_id des aktuell geladenen Fahrzeugs
-        if not vehicles:
-            raise ValueError("Kein Fahrzeug geladen")
-        
-        vehicle_id = next(iter(vehicles.keys()))
-        plan_index = msg["plan_index"] - 1  # Konvertiere 1-basiert zu 0-basiert
-
-        plans = await coordinator.api.get_repeating_plans(vehicle_id)
-        if not (0 <= plan_index < len(plans)):
-            raise IndexError("plan_index out of range")
-
-        for key in ("time", "soc", "active"):
-            if key in msg:
-                plans[plan_index][key] = msg[key]
-        # Konvertiere Wochentage: User 1-7 → EVCC 0-6
-        if "weekdays" in msg:
-            plans[plan_index]["weekdays"] = _convert_weekdays_to_api(msg["weekdays"])
-
-        await coordinator.api.set_repeating_plans(vehicle_id, plans)
-
-        # Konvertiere Pläne zurück zu User-Format für Response/Broadcast
-        user_plans = [
-            {**plan, "weekdays": _convert_weekdays_to_user(plan.get("weekdays"))}
-            for plan in plans
-        ]
-        
-        # Sofort Update (nicht blockierend)
-        updated_data = coordinator.data or {}
-        updated_vehicles = updated_data.get("vehicles", {}).copy()
-        updated_vehicles[vehicle_id] = {
-            "title": updated_vehicles.get(vehicle_id, {}).get("title", vehicle_id),
-            "repeatingPlans": plans
-        }
-        coordinator.async_set_updated_data({"vehicles": updated_vehicles, "id_map": coordinator.id_map})
-        
-        # Trigger Refresh im Hintergrund
-        coordinator.async_request_refresh()
-        
-        # Broadcast sofort nach lokaler Update
-        api = hass.data.get("evcc_scheduler_ws_api")
-        if api:
-            api.broadcast({"type": "plans_updated", "vehicle_id": vehicle_id, "plans": user_plans})
-
         connection.send_result(msg["id"], {"vehicle_id": vehicle_id, "plans": user_plans})
     except Exception as err:
         connection.send_error(msg["id"], "failed", str(err))
@@ -323,6 +268,5 @@ async def ws_delete_scheduler(hass: HomeAssistant, connection, msg) -> None:
 def async_register_ws_commands(hass: HomeAssistant) -> None:
     """Registriere die HA-WS-Kommandos."""
     websocket_api.async_register_command(hass, ws_get_scheduler)
-    websocket_api.async_register_command(hass, ws_add_scheduler)
-    websocket_api.async_register_command(hass, ws_edit_scheduler)
+    websocket_api.async_register_command(hass, ws_set_scheduler)
     websocket_api.async_register_command(hass, ws_delete_scheduler)

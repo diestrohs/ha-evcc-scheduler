@@ -68,8 +68,9 @@ const result = await hass.callWS({
 
 ### Plan bearbeiten
 ```javascript
+// Plan bearbeiten (edit)
 await hass.callWS({
-  type: "scheduler/edit",
+  type: "scheduler/set",
   vehicle_id: "vehicle:123",
   plan_index: 1,  // 1-basiert
   active: true,
@@ -82,7 +83,7 @@ await hass.callWS({
 ### Plan hinzufügen
 ```javascript
 await hass.callWS({
-  type: "scheduler/add",
+  type: "scheduler/set",
   vehicle_id: "vehicle:123",
   time: "07:00",
   soc: 80,
